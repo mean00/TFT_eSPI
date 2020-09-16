@@ -1,9 +1,10 @@
-# This is a slightly modified version
+
+# This fork is a slightly modified version
 The changes are :
-* Meant to work with RClack version of arduino stm32
-* using cmake as build system
+* Meant to work with Roger Clark version of arduino stm32
+* Using arduino-stm32-cmake as build system
 
-
+-- Original Readme below --
 
 # Sprite class change
 The Sprite class has been updated to remove an inconsistency for the setSwapBytes() function. Although all the examples are unchanged, user sketches may be affected. If the colors of the sprite change when loading this new version 2.2.16 then it may be necessary to change the swap bytes setting, e.g. for a sprite instance "spr" use either: spr.setSwapBytes(true) or spr.setSwapBytes(false) to correct the colour.
