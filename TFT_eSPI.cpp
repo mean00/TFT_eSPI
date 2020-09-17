@@ -22,6 +22,8 @@
   #include "Processors/TFT_eSPI_ESP8266.c"
 #elif defined (STM32) // (_VARIANT_ARDUINO_STM32_) stm32_def.h
   #include "Processors/TFT_eSPI_STM32.c"
+#elif defined(CUSTOM_DRIVER)
+    #include "TFT_eSPI_Custom.c"
 #else
   #include "Processors/TFT_eSPI_Generic.c"
 #endif
