@@ -35,11 +35,10 @@
 ***************************************************************************************/
 inline void TFT_eSPI::begin_tft_write(void){
 #if defined (SPI_HAS_TRANSACTION) && defined (SUPPORT_TRANSACTIONS) && !defined(TFT_PARALLEL_8_BIT)
-  if (locked) {
-    locked = false;
+
+    spiLock();
     spi.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
-    CS_L;
-  }
+    CS_L; 
 #else
   CS_L;
 #endif
@@ -52,12 +51,10 @@ inline void TFT_eSPI::begin_tft_write(void){
 ***************************************************************************************/
 inline void TFT_eSPI::end_tft_write(void){
 #if defined (SPI_HAS_TRANSACTION) && defined (SUPPORT_TRANSACTIONS) && !defined(TFT_PARALLEL_8_BIT)
-  if(!inTransaction) {
-    if (!locked) {
-      locked = true;
+  if(!inTransaction) {      
       CS_H;
       spi.endTransaction();
-    }
+      spiUnlock();
   }
   SET_BUS_READ_MODE;
 #else
@@ -73,11 +70,9 @@ inline void TFT_eSPI::end_tft_write(void){
 inline void TFT_eSPI::begin_tft_read(void){
   DMA_BUSY_CHECK; // Wait for any DMA transfer to complete before changing SPI settings
 #if defined (SPI_HAS_TRANSACTION) && defined (SUPPORT_TRANSACTIONS) && !defined(TFT_PARALLEL_8_BIT)
-  if (locked) {
-    locked = false;
+    spiLock();
     spi.beginTransaction(SPISettings(SPI_READ_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
-    CS_L;
-  }
+    CS_L;  
 #else
   #if !defined(TFT_PARALLEL_8_BIT)
     spi.setFrequency(SPI_READ_FREQUENCY);
@@ -94,12 +89,10 @@ inline void TFT_eSPI::begin_tft_read(void){
 inline void TFT_eSPI::end_tft_read(void){
 #if defined (SPI_HAS_TRANSACTION) && defined (SUPPORT_TRANSACTIONS) && !defined(TFT_PARALLEL_8_BIT)
   if(!inTransaction) {
-    if (!locked) {
-      locked = true;
       CS_H;
       spi.endTransaction();
+      spiUnlock();
     }
-  }
 #else
   #if !defined(TFT_PARALLEL_8_BIT)
     spi.setFrequency(SPI_FREQUENCY);
@@ -193,7 +186,7 @@ TFT_eSPI::TFT_eSPI(int16_t w, int16_t h)
 
   _swapBytes = false;   // Do not swap colour bytes by default
 
-  locked = true;        // Transaction mutex lock flags
+
   inTransaction = false;
 
   _booted   = true;     // Default attributes
@@ -310,7 +303,7 @@ void TFT_eSPI::init(uint8_t tc)
 #endif
 
     inTransaction = false;
-    locked = true;
+
 
     INIT_TFT_DATA_BUS;
 

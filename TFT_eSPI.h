@@ -738,7 +738,7 @@ class TFT_eSPI : public Print {
   bool     isDigits;   // adjust bounding box for numbers to reduce visual jiggling
   bool     textwrapX, textwrapY;  // If set, 'wrap' text at right and optionally bottom edge of display
   bool     _swapBytes; // Swap the byte order for TFT pushImage()
-  bool     locked, inTransaction; // SPI transaction and mutex lock flags
+  bool     /* MEANXlocked,*/ inTransaction; // SPI transaction and mutex lock flags
 
   bool     _booted;    // init() or begin() has already run once
   
@@ -748,7 +748,8 @@ class TFT_eSPI : public Print {
   bool     _psram_enable; // Enable PSRAM use for library functions (TBD) and Sprites
 
   uint32_t _lastColor; // Buffered value of last colour used
-
+  virtual  void spiLock() {};
+  virtual  void spiUnlock() {};
 #ifdef LOAD_GFXFF
   GFXfont  *gfxFont;
 #endif
