@@ -326,7 +326,9 @@ void TFT_eSPI::init(uint8_t tc)
 #endif
 
     _booted = false;
+#if 0 // MEANX WTF ?
     end_tft_write();
+#endif
   } // end of: if just _booted
 
   // Toggle RST low to reset
