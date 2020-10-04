@@ -9,7 +9,7 @@
 #ifndef _GFXFONT_H_
 #define _GFXFONT_H_
 
-#ifdef LOAD_GFXFF
+// MEANX #ifdef LOAD_GFXFF
 
 typedef struct { // Data stored PER GLYPH
 	uint32_t bitmapOffset;     // Pointer into GFXfont->bitmap
@@ -25,6 +25,7 @@ typedef struct { // Data stored for FONT AS A WHOLE:
 	uint8_t   yAdvance;    // Newline distance (y axis)
 } GFXfont;
 
+#ifdef LOAD_GFXFF // MEANX
   // Original Adafruit_GFX "Free Fonts"
   #include <Fonts/GFXFF/TomThumb.h>  // TT1
 
