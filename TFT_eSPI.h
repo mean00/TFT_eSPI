@@ -13,11 +13,9 @@
  ****************************************************/
 
 // Stop fonts etc being loaded multiple times
-#ifndef _TFT_eSPIH_
-#define _TFT_eSPIH_
-
+#pragma once
 #define TFT_ESPI_VERSION "2.2.20"
-
+ 
 /***************************************************************************************
 **                         Section 1: Load required header files
 ***************************************************************************************/
@@ -26,7 +24,7 @@
 #include <Arduino.h>
 #include <Print.h>
 #include <SPI.h>
-
+extern SPIClass& spi;
 /***************************************************************************************
 **                         Section 2: Load library and processor specific header files
 ***************************************************************************************/
@@ -677,13 +675,45 @@ class TFT_eSPI : public Print {
            // New begin and end prototypes
            // begin/end a TFT write transaction
            // For SPI bus the transmit clock rate is set
-  inline void begin_tft_write()      __attribute__((always_inline));
-  inline void end_tft_write()        __attribute__((always_inline));
+  inline void begin_tft_write()      __attribute__((always_inline))
+        {
+            spiLock();
+            spi.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
+            CS_L; 
+            SET_BUS_WRITE_MODE;
+        }  
+  inline void end_tft_write()        __attribute__((always_inline))
+            {       
+                if(!inTransaction) 
+                {      
+                    CS_H;
+                    spi.endTransaction();
+                    spiUnlock();
+                }
+                SET_BUS_READ_MODE;
+          }
 
            // begin/end a TFT read transaction
            // For SPI bus: begin lowers SPI clock rate, end reinstates transmit clock rate
-  inline void begin_tft_read() __attribute__((always_inline));
-  inline void end_tft_read()   __attribute__((always_inline));
+  inline void begin_tft_read() __attribute__((always_inline))
+        {
+            DMA_BUSY_CHECK; // Wait for any DMA transfer to complete before changing SPI settings
+            spiLock();
+            spi.beginTransaction(SPISettings(SPI_READ_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
+            CS_L;  
+            SET_BUS_READ_MODE;
+        }
+  inline void end_tft_read()   __attribute__((always_inline))
+        {
+        
+            if(!inTransaction) 
+            {
+              CS_H;
+              spi.endTransaction();
+              spiUnlock();
+            }
+            SET_BUS_WRITE_MODE;
+        }  
 
            // Temporary  library development function  TODO: remove need for this
   void     pushSwapBytePixels(const void* data_in, uint32_t len);
@@ -778,4 +808,3 @@ class TFT_eSPI : public Print {
 // Load the Sprite Class
 #include "Extensions/Sprite.h"
 
-#endif // ends #ifndef _TFT_eSPIH_
