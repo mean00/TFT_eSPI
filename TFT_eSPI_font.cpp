@@ -186,25 +186,6 @@ size_t TFT_eSPI::write(uint8_t utf8)
 
   if (uniCode == 0) return 1;
 
-#ifdef SMOOTH_FONT
-  if(fontLoaded) {
-    //Serial.print("UniCode="); Serial.println(uniCode);
-    //Serial.print("UTF8   ="); Serial.println(utf8);
-
-    //fontFile = SPIFFS.open( _gFontFilename, "r" );
-
-    //if(!fontFile)
-    //{
-    //  fontLoaded = false;
-    //  return 1;
-    //}
-
-    drawGlyph(uniCode);
-
-    //fontFile.close();
-    return 1;
-  }
-#endif
 
   if (uniCode == '\n') uniCode+=22; // Make it a valid space character to stop errors
   else if (uniCode < 32) return 1;
@@ -212,52 +193,9 @@ size_t TFT_eSPI::write(uint8_t utf8)
   uint16_t width = 0;
   uint16_t height = 0;
 
-//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv DEBUG vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-  //Serial.print((uint8_t) uniCode); // Debug line sends all printed TFT text to serial port
-  //Serial.println(uniCode, HEX); // Debug line sends all printed TFT text to serial port
-  //delay(5);                     // Debug optional wait for serial port to flush through
-//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ DEBUG ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-#ifdef LOAD_GFXFF
   if(!gfxFont) {
-#endif
-//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-#ifdef LOAD_FONT2
-  if (textfont == 2) {
-    if (uniCode > 127) return 1;
-
-    width = pgm_read_byte(widtbl_f16 + uniCode-32);
-    height = chr_hgt_f16;
-    // Font 2 is rendered in whole byte widths so we must allow for this
-    width = (width + 6) / 8;  // Width in whole bytes for font 2, should be + 7 but must allow for font width change
-    width = width * 8;        // Width converted back to pixels
-  }
-  #ifdef LOAD_RLE
-  else
-  #endif
-#endif
-
-#ifdef LOAD_RLE
-  {
-    if ((textfont>2) && (textfont<9)) {
-      if (uniCode > 127) return 1;
-      // Uses the fontinfo struct array to avoid lots of 'if' or 'switch' statements
-      width = pgm_read_byte( (uint8_t *)pgm_read_dword( &(fontdata[textfont].widthtbl ) ) + uniCode-32 );
-      height= pgm_read_byte( &fontdata[textfont].height );
-    }
-  }
-#endif
-
-#ifdef LOAD_GLCD
-  if (textfont==1) {
-      width =  6;
-      height = 8;
-  }
-#else
   if (textfont==1) return 1;
-#endif
 
   height = height * textsize;
 
@@ -274,8 +212,7 @@ size_t TFT_eSPI::write(uint8_t utf8)
     cursor_x += drawChar(uniCode, cursor_x, cursor_y, textfont);
   }
 
-//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-#ifdef LOAD_GFXFF
+
   } // Custom GFX font
   else {
     if(utf8 == '\n') {
@@ -305,8 +242,6 @@ size_t TFT_eSPI::write(uint8_t utf8)
       cursor_x += pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize;
     }
   }
-#endif // LOAD_GFXFF
-//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
   return 1;
 }
@@ -327,261 +262,11 @@ int16_t TFT_eSPI::drawChar(uint16_t uniCode, int32_t x, int32_t y, uint8_t font)
 {
   if (!uniCode) return 0;
 
-  if (font==1) {
-#ifdef LOAD_GLCD
-  #ifndef LOAD_GFXFF
-    drawChar(x, y, uniCode, textcolor, textbgcolor, textsize);
-    return 6 * textsize;
-  #endif
-#else
-  #ifndef LOAD_GFXFF
-    return 0;
-  #endif
-#endif
-
-#ifdef LOAD_GFXFF
-    drawChar(x, y, uniCode, textcolor, textbgcolor, textsize);
-    if(!gfxFont) { // 'Classic' built-in font
-    #ifdef LOAD_GLCD
-      return 6 * textsize;
-    #else
-      return 0;
-    #endif
-    }
-    else {
-      if((uniCode >= pgm_read_word(&gfxFont->first)) && (uniCode <= pgm_read_word(&gfxFont->last) )) {
-        uint16_t   c2    = uniCode - pgm_read_word(&gfxFont->first);
-        GFXglyph *glyph = &(((GFXglyph *)pgm_read_dword(&gfxFont->glyph))[c2]);
-        return pgm_read_byte(&glyph->xAdvance) * textsize;
-      }
-      else {
-        return 0;
-      }
-    }
-#endif
-  }
-
-  if ((font>1) && (font<9) && ((uniCode < 32) || (uniCode > 127))) return 0;
-
-  int32_t width  = 0;
-  int32_t height = 0;
-  uint32_t flash_address = 0;
-  uniCode -= 32;
-
-#ifdef LOAD_FONT2
-  if (font == 2) {
-    flash_address = pgm_read_dword(&chrtbl_f16[uniCode]);
-    width = pgm_read_byte(widtbl_f16 + uniCode);
-    height = chr_hgt_f16;
-  }
-  #ifdef LOAD_RLE
-  else
-  #endif
-#endif
-
-#ifdef LOAD_RLE
+  if (font==1) 
   {
-    if ((font>2) && (font<9)) {
-      flash_address = pgm_read_dword( (const void*)(pgm_read_dword( &(fontdata[font].chartbl ) ) + uniCode*sizeof(void *)) );
-      width = pgm_read_byte( (uint8_t *)pgm_read_dword( &(fontdata[font].widthtbl ) ) + uniCode );
-      height= pgm_read_byte( &fontdata[font].height );
-    }
+    drawChar(x, y, uniCode, textcolor, textbgcolor, textsize);    
   }
-#endif
-
-  int32_t w = width;
-  int32_t pX      = 0;
-  int32_t pY      = y;
-  uint8_t line = 0;
-
-#ifdef LOAD_FONT2 // chop out code if we do not need it
-  if (font == 2) {
-    w = w + 6; // Should be + 7 but we need to compensate for width increment
-    w = w / 8;
-    if (x + width * textsize >= (int16_t)_width) return width * textsize ;
-
-    if (textcolor == textbgcolor || textsize != 1) {
-      //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
-      inTransaction = true;
-
-      for (int32_t i = 0; i < height; i++) {
-        if (textcolor != textbgcolor) fillRect(x, pY, width * textsize, textsize, textbgcolor);
-
-        for (int32_t k = 0; k < w; k++) {
-          line = pgm_read_byte((uint8_t *)flash_address + w * i + k);
-          if (line) {
-            if (textsize == 1) {
-              pX = x + k * 8;
-              if (line & 0x80) drawPixel(pX, pY, textcolor);
-              if (line & 0x40) drawPixel(pX + 1, pY, textcolor);
-              if (line & 0x20) drawPixel(pX + 2, pY, textcolor);
-              if (line & 0x10) drawPixel(pX + 3, pY, textcolor);
-              if (line & 0x08) drawPixel(pX + 4, pY, textcolor);
-              if (line & 0x04) drawPixel(pX + 5, pY, textcolor);
-              if (line & 0x02) drawPixel(pX + 6, pY, textcolor);
-              if (line & 0x01) drawPixel(pX + 7, pY, textcolor);
-            }
-            else {
-              pX = x + k * 8 * textsize;
-              if (line & 0x80) fillRect(pX, pY, textsize, textsize, textcolor);
-              if (line & 0x40) fillRect(pX + textsize, pY, textsize, textsize, textcolor);
-              if (line & 0x20) fillRect(pX + 2 * textsize, pY, textsize, textsize, textcolor);
-              if (line & 0x10) fillRect(pX + 3 * textsize, pY, textsize, textsize, textcolor);
-              if (line & 0x08) fillRect(pX + 4 * textsize, pY, textsize, textsize, textcolor);
-              if (line & 0x04) fillRect(pX + 5 * textsize, pY, textsize, textsize, textcolor);
-              if (line & 0x02) fillRect(pX + 6 * textsize, pY, textsize, textsize, textcolor);
-              if (line & 0x01) fillRect(pX + 7 * textsize, pY, textsize, textsize, textcolor);
-            }
-          }
-        }
-        pY += textsize;
-      }
-
-      inTransaction = false;
-      end_tft_write();
-    }
-    else { // Faster drawing of characters and background using block write
-      begin_tft_write();
-
-      setWindow(x, y, x + width - 1, y + height - 1);
-
-      uint8_t mask;
-      for (int32_t i = 0; i < height; i++) {
-        pX = width;
-        for (int32_t k = 0; k < w; k++) {
-          line = pgm_read_byte((uint8_t *) (flash_address + w * i + k) );
-          mask = 0x80;
-          while (mask && pX) {
-            if (line & mask) {tft_Write_16(textcolor);}
-            else {tft_Write_16(textbgcolor);}
-            pX--;
-            mask = mask >> 1;
-          }
-        }
-        if (pX) {tft_Write_16(textbgcolor);}
-      }
-
-      end_tft_write();
-    }
-  }
-
-  #ifdef LOAD_RLE
-  else
-  #endif
-#endif  //FONT2
-
-#ifdef LOAD_RLE  //674 bytes of code
-  // Font is not 2 and hence is RLE encoded
-  {
-    begin_tft_write();
-    inTransaction = true;
-
-    w *= height; // Now w is total number of pixels in the character
-    if ((textsize != 1) || (textcolor == textbgcolor)) {
-      if (textcolor != textbgcolor) fillRect(x, pY, width * textsize, textsize * height, textbgcolor);
-      int32_t px = 0, py = pY; // To hold character block start and end column and row values
-      int32_t pc = 0; // Pixel count
-      uint8_t np = textsize * textsize; // Number of pixels in a drawn pixel
-
-      uint8_t tnp = 0; // Temporary copy of np for while loop
-      uint8_t ts = textsize - 1; // Temporary copy of textsize
-      // 16 bit pixel count so maximum font size is equivalent to 180x180 pixels in area
-      // w is total number of pixels to plot to fill character block
-      while (pc < w) {
-        line = pgm_read_byte((uint8_t *)flash_address);
-        flash_address++;
-        if (line & 0x80) {
-          line &= 0x7F;
-          line++;
-          if (ts) {
-            px = x + textsize * (pc % width); // Keep these px and py calculations outside the loop as they are slow
-            py = y + textsize * (pc / width);
-          }
-          else {
-            px = x + pc % width; // Keep these px and py calculations outside the loop as they are slow
-            py = y + pc / width;
-          }
-          while (line--) { // In this case the while(line--) is faster
-            pc++; // This is faster than putting pc+=line before while()?
-            setWindow(px, py, px + ts, py + ts);
-
-            if (ts) {
-              tnp = np;
-              while (tnp--) {tft_Write_16(textcolor);}
-            }
-            else {tft_Write_16(textcolor);}
-            px += textsize;
-
-            if (px >= (x + width * textsize)) {
-              px = x;
-              py += textsize;
-            }
-          }
-        }
-        else {
-          line++;
-          pc += line;
-        }
-      }
-    }
-    else {
-      // Text colour != background && textsize = 1 and character is within screen area
-      // so use faster drawing of characters and background using block write
-      if ((x >= 0) && (x + width <= _width) && (y >= 0) && (y + height <= _height))
-      {
-        setWindow(x, y, x + width - 1, y + height - 1);
-
-        // Maximum font size is equivalent to 180x180 pixels in area
-        while (w > 0) {
-          line = pgm_read_byte((uint8_t *)flash_address++); // 8 bytes smaller when incrementing here
-          if (line & 0x80) {
-            line &= 0x7F;
-            line++; w -= line;
-            pushBlock(textcolor,line);
-          }
-          else {
-            line++; w -= line;
-            pushBlock(textbgcolor,line);
-          }
-        }
-      }
-      else
-      {
-        int32_t px = x, py = y;  // To hold character block start and end column and row values
-        int32_t pc = 0;          // Pixel count
-        int32_t pl = 0;          // Pixel line length
-        uint16_t pcol = 0;       // Pixel color
-
-        while (pc < w) {
-          line = pgm_read_byte((uint8_t *)flash_address);
-          flash_address++;
-          if (line & 0x80) { pcol = textcolor; line &= 0x7F; }
-          else pcol = textbgcolor;
-          line++;
-          px = x + pc % width;
-          py = y + pc / width;
-
-          pl = 0;
-          pc += line;
-          while (line--) { // In this case the while(line--) is faster
-            pl++;
-            if ((px+pl) >= (x + width)) {
-              drawFastHLine(px, py, pl, pcol);
-              pl = 0;
-              px = x;
-              py ++;
-            }
-          }
-          if (pl)drawFastHLine(px, py, pl, pcol);
-        }
-      }
-    }
-    inTransaction = false;
-    end_tft_write();
-  }
-  // End of RLE font rendering
-#endif
-  return width * textsize;    // x +
+  return 0;
 }
 
 
@@ -746,21 +431,6 @@ int16_t TFT_eSPI::drawString(const char *string, int32_t poX, int32_t poY, uint8
   uint16_t len = strlen(string);
   uint16_t n = 0;
 
-#ifdef SMOOTH_FONT
-  if(fontLoaded) {
-    if (textcolor!=textbgcolor) fillRect(poX, poY, cwidth, cheight, textbgcolor);
-
-    setCursor(poX, poY);
-
-    while (n < len) {
-      uint16_t uniCode = decodeUTF8((uint8_t*)string, &n, len - n);
-      drawGlyph(uniCode);
-    }
-    sumX += cwidth;
-    //fontFile.close();
-  }
-  else
-#endif
   {
     while (n < len) {
       uint16_t uniCode = decodeUTF8((uint8_t*)string, &n, len - n);
@@ -983,7 +653,7 @@ int16_t TFT_eSPI::drawFloat(float floatNumber, uint8_t dp, int32_t poX, int32_t 
 ** Descriptions:            Sets the GFX free font to use
 ***************************************************************************************/
 
-#ifdef LOAD_GFXFF
+
 
 void TFT_eSPI::setFreeFont(const GFXfont *f)
 {
@@ -1020,30 +690,212 @@ void TFT_eSPI::setTextFont(uint8_t f)
   gfxFont = NULL;
 }
 
-#else
 
 
 /***************************************************************************************
-** Function name:           setFreeFont
-** Descriptions:            Sets the GFX free font to use
+** Function name:           textWidth
+** Description:             Return the width in pixels of a string in a given font
 ***************************************************************************************/
-
-// Alternative to setTextFont() so we don't need two different named functions
-void TFT_eSPI::setFreeFont(uint8_t font)
+int16_t TFT_eSPI::textWidth(const String& string)
 {
-  setTextFont(font);
+  int16_t len = string.length() + 2;
+  char buffer[len];
+  string.toCharArray(buffer, len);
+  return textWidth(buffer, textfont);
 }
 
-
-/***************************************************************************************
-** Function name:           setTextFont
-** Description:             Set the font for the print stream
-***************************************************************************************/
-void TFT_eSPI::setTextFont(uint8_t f)
+int16_t TFT_eSPI::textWidth(const String& string, uint8_t font)
 {
-  textfont = (f > 0) ? f : 1; // Don't allow font 0
+  int16_t len = string.length() + 2;
+  char buffer[len];
+  string.toCharArray(buffer, len);
+  return textWidth(buffer, font);
 }
+
+int16_t TFT_eSPI::textWidth(const char *string)
+{
+  return textWidth(string, textfont);
+}
+
+int16_t TFT_eSPI::textWidth(const char *string, uint8_t font)
+{
+  int32_t str_width = 0;
+  uint16_t uniCode  = 0;
+
+#ifdef SMOOTH_FONT
+  if(fontLoaded) {
+    while (*string) {
+      uniCode = decodeUTF8(*string++);
+      if (uniCode) {
+        if (uniCode == 0x20) str_width += gFont.spaceWidth;
+        else {
+          uint16_t gNum = 0;
+          bool found = getUnicodeIndex(uniCode, &gNum);
+          if (found) {
+            if(str_width == 0 && gdX[gNum] < 0) str_width -= gdX[gNum];
+            if (*string || isDigits) str_width += gxAdvance[gNum];
+            else str_width += (gdX[gNum] + gWidth[gNum]);
+          }
+          else str_width += gFont.spaceWidth + 1;
+        }
+      }
+    }
+    isDigits = false;
+    return str_width;
+  }
 #endif
 
-////////////////////////////////////////////////////////////////////////////////////////
+  if (font>1 && font<9) {
+    char *widthtable = (char *)pgm_read_dword( &(fontdata[font].widthtbl ) ) - 32; //subtract the 32 outside the loop
+
+    while (*string) {
+      uniCode = *(string++);
+      if (uniCode > 31 && uniCode < 128)
+      str_width += pgm_read_byte( widthtable + uniCode); // Normally we need to subtract 32 from uniCode
+      else str_width += pgm_read_byte( widthtable + 32); // Set illegal character = space width
+    }
+
+  }
+  else {
+
+#ifdef LOAD_GFXFF
+    if(gfxFont) { // New font
+      while (*string) {
+        uniCode = decodeUTF8(*string++);
+        if ((uniCode >= pgm_read_word(&gfxFont->first)) && (uniCode <= pgm_read_word(&gfxFont->last ))) {
+          uniCode -= pgm_read_word(&gfxFont->first);
+          GFXglyph *glyph  = &(((GFXglyph *)pgm_read_dword(&gfxFont->glyph))[uniCode]);
+          // If this is not the  last character or is a digit then use xAdvance
+          if (*string  || isDigits) str_width += pgm_read_byte(&glyph->xAdvance);
+          // Else use the offset plus width since this can be bigger than xAdvance
+          else str_width += ((int8_t)pgm_read_byte(&glyph->xOffset) + pgm_read_byte(&glyph->width));
+        }
+      }
+    }
+    else
+#endif
+    {
+#ifdef LOAD_GLCD
+      while (*string++) str_width += 6;
+#endif
+    }
+  }
+  isDigits = false;
+  return str_width * textsize;
+}
+
+
+/***************************************************************************************
+** Function name:           fontsLoaded
+** Description:             return an encoded 16 bit value showing the fonts loaded
+***************************************************************************************/
+// Returns a value showing which fonts are loaded (bit N set =  Font N loaded)
+
+uint16_t TFT_eSPI::fontsLoaded(void)
+{
+  return fontsloaded;
+}
+
+
+/***************************************************************************************
+** Function name:           fontHeight
+** Description:             return the height of a font (yAdvance for free fonts)
+***************************************************************************************/
+int16_t TFT_eSPI::fontHeight(int16_t font)
+{
+  if (font==1) {
+    if(gfxFont) { // New font
+      return pgm_read_byte(&gfxFont->yAdvance) * textsize;
+    }
+  }
+  return pgm_read_byte( &fontdata[font].height ) * textsize;
+}
+
+int16_t TFT_eSPI::fontHeight(void)
+{
+  return fontHeight(textfont);
+}
+
+/***************************************************************************************
+** Function name:           drawChar
+** Description:             draw a single character in the GLCD or GFXFF font
+***************************************************************************************/
+void TFT_eSPI::drawChar(int32_t x, int32_t y, uint16_t c, uint32_t color, uint32_t bg, uint8_t size)
+{
+  if ((x >= _width)            || // Clip right
+      (y >= _height)           || // Clip bottom
+      ((x + 6 * size - 1) < 0) || // Clip left
+      ((y + 8 * size - 1) < 0))   // Clip top
+    return;
+
+  if (c < 32) return;
+
+
+    // Filter out bad characters not present in font
+    if(!((c >= pgm_read_word(&gfxFont->first)) && (c <= pgm_read_word(&gfxFont->last ))))
+        return;
+// MEANX , we dont use sprite but we check the nesting....     
+    begin_tft_write();
+// /MEANS              
+    inTransaction = true;
+
+
+    c -= pgm_read_word(&gfxFont->first);
+    GFXglyph *glyph  = &(((GFXglyph *)pgm_read_dword(&gfxFont->glyph))[c]);
+    uint8_t  *bitmap = (uint8_t *)pgm_read_dword(&gfxFont->bitmap);
+
+    uint32_t bo = pgm_read_word(&glyph->bitmapOffset);
+    uint8_t  w  = pgm_read_byte(&glyph->width),
+             h  = pgm_read_byte(&glyph->height);
+             //xa = pgm_read_byte(&glyph->xAdvance);
+    int8_t   xo = pgm_read_byte(&glyph->xOffset),
+             yo = pgm_read_byte(&glyph->yOffset);
+    uint8_t  xx, yy, bits=0, bit=0;
+    int16_t  xo16 = 0, yo16 = 0;
+
+    if(size > 1) 
+    {
+      xo16 = xo;
+      yo16 = yo;
+    }
+
+    // GFXFF rendering speed up
+    uint16_t hpc = 0; // Horizontal foreground pixel count
+    for(yy=0; yy<h; yy++) 
+    {
+      for(xx=0; xx<w; xx++) 
+      {
+        if(bit == 0) 
+        {
+          bits = pgm_read_byte(&bitmap[bo++]);
+          bit  = 0x80;
+        }
+        if(bits & bit) 
+            hpc++;
+        else 
+        {
+         if (hpc) 
+         {
+            if(size == 1) 
+                drawFastHLine(x+xo+xx-hpc, y+yo+yy, hpc, color);
+            else 
+                fillRect(x+(xo16+xx-hpc)*size, y+(yo16+yy)*size, size*hpc, size, color);
+            hpc=0;
+          }
+        }
+        bit >>= 1;
+      }
+      // Draw pixels for this line as we are about to increment yy
+      if (hpc) 
+      {
+        if(size == 1) 
+            drawFastHLine(x+xo+xx-hpc, y+yo+yy, hpc, color);
+        else 
+            fillRect(x+(xo16+xx-hpc)*size, y+(yo16+yy)*size, size*hpc, size, color);
+        hpc=0;
+      }
+    }
+    inTransaction = false;
+    end_tft_write();              // Does nothing if Sprite class uses this function
+}
 

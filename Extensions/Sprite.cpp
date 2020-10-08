@@ -2136,129 +2136,64 @@ void TFT_eSprite::drawChar(int32_t x, int32_t y, uint16_t c, uint32_t color, uin
     return;
 
   if (c < 32) return;
-#ifdef LOAD_GLCD
-//>>>>>>>>>>>>>>>>>>
-#ifdef LOAD_GFXFF
-  if(!gfxFont) { // 'Classic' built-in font
-#endif
-//>>>>>>>>>>>>>>>>>>
 
-  bool fillbg = (bg != color);
-
-  if ((size==1) && fillbg)
-  {
-    uint8_t column[6];
-    uint8_t mask = 0x1;
-
-    for (int8_t i = 0; i < 5; i++ ) column[i] = pgm_read_byte(font + (c * 5) + i);
-    column[5] = 0;
-
-    int8_t j, k;
-    for (j = 0; j < 8; j++) {
-      for (k = 0; k < 5; k++ ) {
-        if (column[k] & mask) {
-          drawPixel(x + k, y + j, color);
-        }
-        else {
-          drawPixel(x + k, y + j, bg);
-        }
-      }
-
-      mask <<= 1;
-
-      drawPixel(x + k, y + j, bg);
-    }
-  }
-  else
-  {
-    for (int8_t i = 0; i < 6; i++ ) {
-      uint8_t line;
-      if (i == 5)
-        line = 0x0;
-      else
-        line = pgm_read_byte(font + (c * 5) + i);
-
-      if (size == 1) // default size
-      {
-        for (int8_t j = 0; j < 8; j++) {
-          if (line & 0x1) drawPixel(x + i, y + j, color);
-          line >>= 1;
-        }
-      }
-      else {  // big size
-        for (int8_t j = 0; j < 8; j++) {
-          if (line & 0x1) fillRect(x + (i * size), y + (j * size), size, size, color);
-          else if (fillbg) fillRect(x + i * size, y + j * size, size, size, bg);
-          line >>= 1;
-        }
-      }
-    }
-  }
-
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#ifdef LOAD_GFXFF
-  } else { // Custom font
-#endif
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#endif // LOAD_GLCD
-
-#ifdef LOAD_GFXFF
     // Filter out bad characters not present in font
-    if ((c >= pgm_read_word(&gfxFont->first)) && (c <= pgm_read_word(&gfxFont->last )))
+    if ((c < pgm_read_word(&gfxFont->first)) || (c > pgm_read_word(&gfxFont->last )))
+        return;
+
+
+    c -= pgm_read_word(&gfxFont->first);
+    GFXglyph *glyph  = &(((GFXglyph *)pgm_read_dword(&gfxFont->glyph))[c]);
+    uint8_t  *bitmap = (uint8_t *)pgm_read_dword(&gfxFont->bitmap);
+
+    uint32_t bo = pgm_read_word(&glyph->bitmapOffset);
+    uint8_t  w  = pgm_read_byte(&glyph->width),
+             h  = pgm_read_byte(&glyph->height);
+             //xa = pgm_read_byte(&glyph->xAdvance);
+    int8_t   xo = pgm_read_byte(&glyph->xOffset),
+             yo = pgm_read_byte(&glyph->yOffset);
+    uint8_t  xx, yy, bits=0, bit=0;
+    int16_t  xo16 = 0, yo16 = 0;
+
+    if(size > 1) 
     {
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      xo16 = xo;
+      yo16 = yo;
+    }
 
-      c -= pgm_read_word(&gfxFont->first);
-      GFXglyph *glyph  = &(((GFXglyph *)pgm_read_dword(&gfxFont->glyph))[c]);
-      uint8_t  *bitmap = (uint8_t *)pgm_read_dword(&gfxFont->bitmap);
-
-      uint32_t bo = pgm_read_word(&glyph->bitmapOffset);
-      uint8_t  w  = pgm_read_byte(&glyph->width),
-               h  = pgm_read_byte(&glyph->height);
-               //xa = pgm_read_byte(&glyph->xAdvance);
-      int8_t   xo = pgm_read_byte(&glyph->xOffset),
-               yo = pgm_read_byte(&glyph->yOffset);
-      uint8_t  xx, yy, bits=0, bit=0;
-      int16_t  xo16 = 0, yo16 = 0;
-
-      if(size > 1) {
-        xo16 = xo;
-        yo16 = yo;
+    uint16_t hpc = 0; // Horizontal foreground pixel count
+    for(yy=0; yy<h; yy++) 
+    {
+      for(xx=0; xx<w; xx++) 
+      {
+        if(bit == 0) 
+        {
+          bits = pgm_read_byte(&bitmap[bo++]);
+          bit  = 0x80;
+        }
+        if(bits & bit) 
+            hpc++;
+        else 
+        {
+          if (hpc) 
+          {
+            if(size == 1) drawFastHLine(x+xo+xx-hpc, y+yo+yy, hpc, color);
+            else fillRect(x+(xo16+xx-hpc)*size, y+(yo16+yy)*size, size*hpc, size, color);
+            hpc=0;
+          }
+        }
+        bit >>= 1;
       }
-
-      uint16_t hpc = 0; // Horizontal foreground pixel count
-      for(yy=0; yy<h; yy++) {
-        for(xx=0; xx<w; xx++) {
-          if(bit == 0) {
-            bits = pgm_read_byte(&bitmap[bo++]);
-            bit  = 0x80;
-          }
-          if(bits & bit) hpc++;
-          else {
-            if (hpc) {
-              if(size == 1) drawFastHLine(x+xo+xx-hpc, y+yo+yy, hpc, color);
-              else fillRect(x+(xo16+xx-hpc)*size, y+(yo16+yy)*size, size*hpc, size, color);
-              hpc=0;
-            }
-          }
-          bit >>= 1;
-        }
-        // Draw pixels for this line as we are about to increment yy
-        if (hpc) {
-          if(size == 1) drawFastHLine(x+xo+xx-hpc, y+yo+yy, hpc, color);
-          else fillRect(x+(xo16+xx-hpc)*size, y+(yo16+yy)*size, size*hpc, size, color);
-          hpc=0;
-        }
+      // Draw pixels for this line as we are about to increment yy
+      if (hpc) {
+        if(size == 1) 
+            drawFastHLine(x+xo+xx-hpc, y+yo+yy, hpc, color);
+        else 
+            fillRect(x+(xo16+xx-hpc)*size, y+(yo16+yy)*size, size*hpc, size, color);
+        hpc=0;
       }
     }
-#endif
-
-
-#ifdef LOAD_GLCD
-  #ifdef LOAD_GFXFF
-  } // End classic vs custom font
-  #endif
-#endif
+  }
 
 }
 
