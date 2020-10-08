@@ -265,6 +265,15 @@ int16_t TFT_eSPI::drawChar(uint16_t uniCode, int32_t x, int32_t y, uint8_t font)
   if (font==1) 
   {
     drawChar(x, y, uniCode, textcolor, textbgcolor, textsize);    
+    if(!gfxFont) 
+      return 0;
+    if((uniCode >= pgm_read_word(&gfxFont->first)) && (uniCode <= pgm_read_word(&gfxFont->last) )) 
+    {
+      uint16_t   c2    = uniCode - pgm_read_word(&gfxFont->first);
+      GFXglyph *glyph = &(((GFXglyph *)pgm_read_dword(&gfxFont->glyph))[c2]);
+      return pgm_read_byte(&glyph->xAdvance) * textsize;
+    }
+    
   }
   return 0;
 }
@@ -897,5 +906,6 @@ void TFT_eSPI::drawChar(int32_t x, int32_t y, uint16_t c, uint32_t color, uint32
     }
     inTransaction = false;
     end_tft_write();              // Does nothing if Sprite class uses this function
+    return ;
 }
 
