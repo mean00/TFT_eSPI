@@ -370,6 +370,7 @@ class TFT_eSPI : public Print {
   // These are virtual so the TFT_eSprite class can override them with sprite specific functions
   virtual void     drawPixel(int32_t x, int32_t y, uint32_t color),
                    drawChar(int32_t x, int32_t y, uint16_t c, uint32_t color, uint32_t bg, uint8_t size),
+                   drawChar1(int32_t x, int32_t y, uint16_t c, uint32_t color, uint32_t bg, uint8_t size),
                    drawLine(int32_t xs, int32_t ys, int32_t xe, int32_t ye, uint32_t color),
                    drawFastVLine(int32_t x, int32_t y, int32_t h, uint32_t color),
                    drawFastHLine(int32_t x, int32_t y, int32_t w, uint32_t color),

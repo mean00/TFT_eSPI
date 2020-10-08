@@ -838,14 +838,15 @@ void TFT_eSPI::drawChar(int32_t x, int32_t y, uint16_t c, uint32_t color, uint32
     return;
 
   if (c < 32) return;
-
+  
 
     // Filter out bad characters not present in font
     if(!((c >= pgm_read_word(&gfxFont->first)) && (c <= pgm_read_word(&gfxFont->last ))))
         return;
-// MEANX , we dont use sprite but we check the nesting....     
-    begin_tft_write();
-// /MEANS              
+  
+    if(size==1)
+        return drawChar1(x,y,c,color,bg,size);
+  
     inTransaction = true;
 
 
@@ -885,10 +886,7 @@ void TFT_eSPI::drawChar(int32_t x, int32_t y, uint16_t c, uint32_t color, uint32
         {
          if (hpc) 
          {
-            if(size == 1) 
-                drawFastHLine(x+xo+xx-hpc, y+yo+yy, hpc, color);
-            else 
-                fillRect(x+(xo16+xx-hpc)*size, y+(yo16+yy)*size, size*hpc, size, color);
+            fillRect(x+(xo16+xx-hpc)*size, y+(yo16+yy)*size, size*hpc, size, color);
             hpc=0;
           }
         }
@@ -897,15 +895,79 @@ void TFT_eSPI::drawChar(int32_t x, int32_t y, uint16_t c, uint32_t color, uint32
       // Draw pixels for this line as we are about to increment yy
       if (hpc) 
       {
-        if(size == 1) 
-            drawFastHLine(x+xo+xx-hpc, y+yo+yy, hpc, color);
-        else 
             fillRect(x+(xo16+xx-hpc)*size, y+(yo16+yy)*size, size*hpc, size, color);
         hpc=0;
       }
     }
-    inTransaction = false;
-    end_tft_write();              // Does nothing if Sprite class uses this function
+    inTransaction = false;    
     return ;
 }
+void TFT_eSPI::drawChar1(int32_t x, int32_t y, uint16_t c, uint32_t color, uint32_t bg, uint8_t size)
+{
+  if ((x >= _width)            || // Clip right
+      (y >= _height)           || // Clip bottom
+      ((x + 6 * size - 1) < 0) || // Clip left
+      ((y + 8 * size - 1) < 0))   // Clip top
+    return;
 
+  if (c < 32) return;
+
+
+    // Filter out bad characters not present in font
+    if(!((c >= pgm_read_word(&gfxFont->first)) && (c <= pgm_read_word(&gfxFont->last ))))
+        return;
+    inTransaction = true;
+
+
+    c -= pgm_read_word(&gfxFont->first);
+    GFXglyph *glyph  = &(((GFXglyph *)pgm_read_dword(&gfxFont->glyph))[c]);
+    uint8_t  *bitmap = (uint8_t *)pgm_read_dword(&gfxFont->bitmap);
+
+    uint32_t bo = pgm_read_word(&glyph->bitmapOffset);
+    uint8_t  w  = pgm_read_byte(&glyph->width),
+             h  = pgm_read_byte(&glyph->height);
+             //xa = pgm_read_byte(&glyph->xAdvance);
+    int8_t   xo = pgm_read_byte(&glyph->xOffset),
+             yo = pgm_read_byte(&glyph->yOffset);
+    uint8_t  xx, yy, bits=0, bit=0;
+    int16_t  xo16 = 0, yo16 = 0;
+
+    if(size > 1) 
+    {
+      xo16 = xo;
+      yo16 = yo;
+    }
+
+    // GFXFF rendering speed up
+    uint16_t hpc = 0; // Horizontal foreground pixel count
+    for(yy=0; yy<h; yy++) 
+    {
+      for(xx=0; xx<w; xx++) 
+      {
+        if(bit == 0) 
+        {
+          bits = pgm_read_byte(&bitmap[bo++]);
+          bit  = 0x80;
+        }
+        if(bits & bit) 
+            hpc++;
+        else 
+        {
+         if (hpc) 
+         {
+            drawFastHLine(x+xo+xx-hpc, y+yo+yy, hpc, color);
+            hpc=0;
+          }
+        }
+        bit >>= 1;
+      }
+      // Draw pixels for this line as we are about to increment yy
+      if (hpc) 
+      {
+        drawFastHLine(x+xo+xx-hpc, y+yo+yy, hpc, color);
+        hpc=0;
+      }
+    }
+    inTransaction = false;    
+    return ;
+}
