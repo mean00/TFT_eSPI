@@ -390,7 +390,7 @@ class TFT_eSPI : public Print {
   // The TFT_eSprite class inherits the following functions (not all are useful to Sprite class
   void     setAddrWindow(int32_t xs, int32_t ys, int32_t w, int32_t h), // Note: start coordinates + width and height
            setWindow(int32_t xs, int32_t ys, int32_t xe, int32_t ye);   // Note: start + end coordinates
-
+  void     setWindowLocked(int32_t x0, int32_t y0, int32_t x1, int32_t y1); // same as above but with begin/end spi 
   // Push (aka write pixel) colours to the TFT (use setAddrWindow() first)
   void     pushColor(uint16_t color),
            pushColor(uint16_t color, uint32_t len),  // Deprecated, use pushBlock()
@@ -663,10 +663,8 @@ class TFT_eSPI : public Print {
 
   uint8_t  decoderState = 0;   // UTF8 decoder state        - not for user access
   uint16_t decoderBuffer;      // Unicode code-point buffer - not for user access
-
- //--------------------------------------- private ------------------------------------//
- private:
-           // Legacy begin and end prototypes - deprecated TODO: delete
+protected:
+         // Legacy begin and end prototypes - deprecated TODO: delete
   void     spi_begin();
   void     spi_end();
 
@@ -716,6 +714,9 @@ class TFT_eSPI : public Print {
             SET_BUS_WRITE_MODE;
         }  
 
+ //--------------------------------------- private ------------------------------------//
+ private:
+      
            // Temporary  library development function  TODO: remove need for this
   void     pushSwapBytePixels(const void* data_in, uint32_t len);
 

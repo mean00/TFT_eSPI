@@ -858,7 +858,19 @@ void TFT_eSPI::setWindow(int32_t x0, int32_t y0, int32_t x1, int32_t y1)
 
   //end_tft_write(); // Must be called after setWindow
 }
-
+/**
+ * 
+ * @param x0
+ * @param y0
+ * @param x1
+ * @param y1
+ */
+void TFT_eSPI::setWindowLocked(int32_t x0, int32_t y0, int32_t x1, int32_t y1)
+{
+    begin_tft_write();
+    setWindow(x0,y0,x1,y1);
+    end_tft_write();
+}
 
 /***************************************************************************************
 ** Function name:           readAddrWindow
