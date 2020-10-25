@@ -93,11 +93,6 @@ class TFT_eSPI : public Print{
            pushColors(uint16_t  *data, uint32_t len, bool swap = true), // With byte swap option
            pushColors(uint8_t  *data, uint32_t len); // Deprecated, use pushPixels()
 
-           // Write a solid block of a single colour
-  void     pushBlock(uint16_t color, uint32_t len);
-
-           // Write a set of pixels stored in memory, use setSwapBytes(true/false) function to correct endianess
-  void     pushPixels(const void * data_in, uint32_t len);
 
           
   // Graphics drawing
@@ -203,7 +198,13 @@ protected:
                 }
                 
           }
+  
+  // Put your highly optimized stuff in these 2 functions
+    virtual void              pushBlock(uint16_t color, uint32_t len)=0;
+    virtual void              pushPixels(const void* data_in, uint32_t len)=0;
 
+  
+  
  //--------------------------------------- private ------------------------------------//
  private:
  

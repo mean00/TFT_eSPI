@@ -21,12 +21,12 @@ public:
       const GFXfont    *font;        
     };
       
-    TFT_eSPI_extended(xMutex *tex,int _W  , int _H, int pinCS, int pinDC, int pinRst=-1) : TFT_eSPI(_W,_H, pinCS,pinDC,pinRst)
+    TFT_eSPI_extended(SPIClass &spi,xMutex *tex,int _W  , int _H, int pinCS, int pinDC, int pinRst) : TFT_eSPI(_W,_H, pinCS,pinDC,pinRst),_spi(spi)
     {
         this->tex=tex;
         currentFont=NULL;
         textcolor=ILI9341_WHITE;
-        textbgcolor=ILI9341_BLACK;
+        textbgcolor=ILI9341_BLACK;        
     }
     void drawBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
     void drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
@@ -49,8 +49,12 @@ protected:
     
     FontInfo          fontInfo[3];
     FontInfo          *currentFont;    
-    uint32_t textcolor, textbgcolor;         // Text foreground and background colours
-
+    uint32_t          textcolor, textbgcolor;         // Text foreground and background colours
+    void              myDataSend(SPIClass &mySpi, uint16_t *data, int len, int minc);
+    void              pushBlock(uint16_t color, uint32_t len);
+    void              pushPixels(const void* data_in, uint32_t len);
+    
+    SPIClass          &_spi;
 };
 
 // eof
