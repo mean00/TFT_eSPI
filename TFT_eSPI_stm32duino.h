@@ -7,11 +7,9 @@ extern int tftLocked;
 class  TFT_eSPI_stm32duino : public TFT_eSPI
 {
 public:    
-    TFT_eSPI_stm32duino(SPIClass &spi, xMutex *tex,int _W , int _H , int pinCS, int pinDC, int pinRst=-1)  :  TFT_eSPI(_W ,   _H ,   pinCS,   pinDC,   pinRst),_spi(spi),_tex(tex)
-    {
-        
-    }
-    
+    TFT_eSPI_stm32duino(SPIClass &spi, xMutex *tex,int _W , int _H , int pinCS, int pinDC, int pinRst=-1);
+    void txDone();
+public:    
     void spiLock() {_tex->lock();tftLocked++;}
     void spiUnlock() {tftLocked--;if(tftLocked<0) xAssert(0);_tex->unlock();}
     
@@ -50,8 +48,9 @@ public:
             spiUnlock();
         }
     }
-
+    
     SPIClass            &_spi;
+    xBinarySemaphore    *_sem;
 };
 
 // eof

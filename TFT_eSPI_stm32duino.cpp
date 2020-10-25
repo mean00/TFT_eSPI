@@ -9,6 +9,40 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 #include "TFT_eSPI_stm32duino.h"
 
+TFT_eSPI_stm32duino *instance=NULL;
+/**
+ * 
+ */
+void txCallback()
+{
+    if(instance)
+        instance->txDone();
+}
+/**
+ * 
+ */
+void TFT_eSPI_stm32duino::txDone()
+{
+   _sem->giveFromInterrupt();
+}
+
+
+/**
+ * 
+ * @param spi
+ * @param tex
+ * @param _W
+ * @param _H
+ * @param pinCS
+ * @param pinDC
+ * @param pinRst
+ */
+
+TFT_eSPI_stm32duino::TFT_eSPI_stm32duino(SPIClass &spi, xMutex *tex,int _W , int _H , int pinCS, int pinDC, int pinRst)  :  TFT_eSPI(_W ,   _H ,   pinCS,   pinDC,   pinRst),_spi(spi),_tex(tex)
+{
+    instance=this;
+    _sem=new xBinarySemaphore;
+}
 /***************************************************************************************
 ** Function name:           pushBlock - for STM32
 ** Description:             Write a block of pixels of the same colour
@@ -21,11 +55,27 @@ void TFT_eSPI_stm32duino::myDataSend( uint16_t *data, int len, int minc)
         if(len>65535) v=65535;
             else v=len;
         len-=v;     
-        _spi.dmaSend(data,v,minc);
+        if(v>1000) // more than ~ 500 us
+        {
+            _spi.onTransmit(txCallback);
+            _spi.dmaSendAsync(data,v,minc); 
+            _sem->take();
+            _spi.onTransmit(NULL);
+            
+        }else
+        {
+            _spi.dmaSend(data,v,minc); // just send and wait
+        }
+        
         if(minc)
             data+=v;
     }   
 }
+/**
+ * 
+ * @param color
+ * @param len
+ */
 void TFT_eSPI_stm32duino::pushBlock(uint16_t color, uint32_t len)
 {
     //color=(color>>8)+((color&0xff)<<8);
