@@ -14,71 +14,9 @@
 
 // Customised User_Setup files are stored in the "User_Setups" folder.
 
-#ifndef USER_SETUP_LOADED //  Lets PlatformIO users define settings in
-                          //  platformio.ini, see notes in "Tools" folder.
-
 // Only ONE line below should be uncommented.  Add extra lines and files as needed.
 
 #include <User_Setup.h>           // Default setup is root library folder
-
-//#include <User_Setups/Setup1_ILI9341.h>  // Setup file configured for my ILI9341
-//#include <User_Setups/Setup2_ST7735.h>   // Setup file configured for my ST7735
-//#include <User_Setups/Setup3_ILI9163.h>  // Setup file configured for my ILI9163
-//#include <User_Setups/Setup4_S6D02A1.h>  // Setup file configured for my S6D02A1
-//#include <User_Setups/Setup5_RPi_ILI9486.h>        // Setup file configured for my stock RPi TFT
-//#include <User_Setups/Setup6_RPi_Wr_ILI9486.h>     // Setup file configured for my modified RPi TFT
-//#include <User_Setups/Setup7_ST7735_128x128.h>     // Setup file configured for my ST7735 128x128 display
-//#include <User_Setups/Setup8_ILI9163_128x128.h>    // Setup file configured for my ILI9163 128x128 display
-//#include <User_Setups/Setup9_ST7735_Overlap.h>     // Setup file configured for my ST7735
-//#include <User_Setups/Setup10_RPi_touch_ILI9486.h> // Setup file configured for ESP8266 and RPi TFT with touch
-
-//#include <User_Setups/Setup11_RPi_touch_ILI9486.h> // Setup file configured for ESP32 and RPi TFT with touch
-//#include <User_Setups/Setup12_M5Stack.h>           // Setup file for the ESP32 based M5Stack
-//#include <User_Setups/Setup13_ILI9481_Parallel.h>  // Setup file for the ESP32 with parallel bus TFT
-//#include <User_Setups/Setup14_ILI9341_Parallel.h>  // Setup file for the ESP32 with parallel bus TFT
-//#include <User_Setups/Setup15_HX8357D.h>           // Setup file configured for HX8357D (untested)
-//#include <User_Setups/Setup16_ILI9488_Parallel.h>  // Setup file for the ESP32 with parallel bus TFT
-//#include <User_Setups/Setup17_ePaper.h>            // Setup file for any Waveshare ePaper display
-//#include <User_Setups/Setup18_ST7789.h>            // Setup file configured for ST7789
-
-//#include <User_Setups/Setup19_RM68140_Parallel.h>	 // Setup file configured for RM68140 with parallel bus
-
-//#include <User_Setups/Setup20_ILI9488.h>           // Setup file for ESP8266 and ILI9488 SPI bus TFT
-//#include <User_Setups/Setup21_ILI9488.h>           // Setup file for ESP32 and ILI9488 SPI bus TFT
-
-//#include <User_Setups/Setup22_TTGO_T4.h>           // Setup file for ESP32 and TTGO T4 version 1.2
-//#include <User_Setups/Setup22_TTGO_T4_v1.3.h>      // Setup file for ESP32 and TTGO T4 version 1.3
-//#include <User_Setups/Setup23_TTGO_TM.h>           // Setup file for ESP32 and TTGO TM ST7789 SPI bus TFT
-//#include <User_Setups/Setup24_ST7789.h>            // Setup file configured for ST7789 240 x 240
-//#include <User_Setups/Setup25_TTGO_T_Display.h>    // Setup file for ESP32 and TTGO T-Display ST7789V SPI bus TFT
-//#include <User_Setups/Setup26_TTGO_T_Wristband.h>  // Setup file for ESP32 and TTGO T-Wristband ST7735 SPI bus TFT
-
-//#include <User_Setups/Setup27_RPi_ST7796_ESP32.h>    // ESP32   RPi MHS-4.0 inch Display-B
-//#include <User_Setups/Setup28_RPi_ST7796_ESP8266.h>  // ESP8266 RPi MHS-4.0 inch Display-B
-
-//#include <User_Setups/Setup29_ILI9341_STM32.h>          // Setup for Nucleo board
-//#include <User_Setups/Setup30_ILI9341_Parallel_STM32.h> // Setup for Nucleo board and parallel display
-//#include <User_Setups/Setup31_ST7796_Parallel_STM32.h>  // Setup for Nucleo board and parallel display
-//#include <User_Setups/Setup32_ILI9341_STM32F103.h>      // Setup for "Blue/Black Pill"
-
-//#include <User_Setups/Setup33_RPi_ILI9486_STM32.h>      // Setup for Nucleo board
-
-//#include <User_Setups/Setup34_ILI9481_Parallel_STM32.h> // Setup for Nucleo board and parallel display
-//#include <User_Setups/Setup35_ILI9341_STM32_Port_Bus.h> // Setup for STM32 port A parallel display
-
-//#include <User_Setups/Setup36_RPi_touch_ILI9341.h>      // Setup file configured for ESP32 and RPi TFT with touch
-
-//#include <User_Setups/Setup43_ST7735.h>            // Setup file configured for my ST7735S 80x160
-//#include <User_Setups/Setup44_TTGO_CameraPlus.h>   // Setup file for ESP32 and TTGO T-CameraPlus ST7789 SPI bus TFT    240x240
-//#include <User_Setups/Setup45_TTGO_T_Watch.h>      // Setup file for ESP32 and TTGO T-Watch ST7789 SPI bus TFT  240x240
-
-//#include <User_Setups/Setup135_ST7789.h>           // Setup file for ESP8266 and ST7789 135 x 240 TFT
-
-//#include <User_Setups/SetupX_Template.h>
-
-
-#endif // USER_SETUP_LOADED
-
 
 
 /////////////////////////////////////////////////////////////////////////////////////

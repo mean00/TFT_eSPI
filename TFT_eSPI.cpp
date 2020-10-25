@@ -18,7 +18,7 @@
 
 #include "TFT_eSPI_Custom.c"
 
-  
+
 /***************************************************************************************
 ** Function name:           TFT_eSPI
 ** Description:             Constructor , we must use hardware SPI pins
@@ -35,8 +35,6 @@ TFT_eSPI::TFT_eSPI(int w, int h,int pinCS, int pinDC, int pinRst)
   pinMode(_csPin, OUTPUT);
   digitalWrite(_csPin, HIGH); // Chip select high (inactive)
 
-
-
   pinMode(_dcPin, OUTPUT);
   digitalWrite(_dcPin, HIGH); // Data/Command high = data mode
 
@@ -51,12 +49,8 @@ TFT_eSPI::TFT_eSPI(int w, int h,int pinCS, int pinDC, int pinRst)
   rotation  = 0;
   cursor_y  = cursor_x  = 0;
   padX = 0;             // No padding
-
   _swapBytes = false;   // Do not swap colour bytes by default
-
-
   inTransaction = false;
-
   _booted   = true;     // Default attributes
   addr_row = 0xFFFF;
   addr_col = 0xFFFF;
@@ -115,66 +109,8 @@ void TFT_eSPI::init(uint8_t tc)
   begin_tft_write();
 
   tc = tc; // Supress warning
+  #include "TFT_eSPI_init.h"
 
-  // This loads the driver specific initialisation code  <<<<<<<<<<<<<<<<<<<<< ADD NEW DRIVERS TO THE LIST HERE <<<<<<<<<<<<<<<<<<<<<<<
-#if   defined (ILI9341_DRIVER)
-    #include "TFT_Drivers/ILI9341_Init.h"
-
-#elif defined (ST7735_DRIVER)
-    tabcolor = tc;
-    #include "TFT_Drivers/ST7735_Init.h"
-
-#elif defined (ILI9163_DRIVER)
-    #include "TFT_Drivers/ILI9163_Init.h"
-
-#elif defined (S6D02A1_DRIVER)
-    #include "TFT_Drivers/S6D02A1_Init.h"
-
-#elif defined (ST7796_DRIVER)
-    #include "TFT_Drivers/ST7796_Init.h"
-
-#elif defined (ILI9486_DRIVER)
-    #include "TFT_Drivers/ILI9486_Init.h"
-
-#elif defined (ILI9481_DRIVER)
-    #include "TFT_Drivers/ILI9481_Init.h"
-
-#elif defined (ILI9488_DRIVER)
-    #include "TFT_Drivers/ILI9488_Init.h"
-
-#elif defined (HX8357D_DRIVER)
-    #include "TFT_Drivers/HX8357D_Init.h"
-
-#elif defined (ST7789_DRIVER)
-    #include "TFT_Drivers/ST7789_Init.h"
-
-#elif defined (R61581_DRIVER)
-    #include "TFT_Drivers/R61581_Init.h"
-
-#elif defined (RM68140_DRIVER)
-	#include "TFT_Drivers/RM68140_Init.h"
-
-#elif defined (ST7789_2_DRIVER)
-    #include "TFT_Drivers/ST7789_2_Init.h"
-
-#elif defined (SSD1963_480_DRIVER)
-    #include "TFT_Drivers/SSD1963_Init.h"
-
-#elif defined (SSD1963_800_DRIVER)
-    #include "TFT_Drivers/SSD1963_Init.h"
-
-#elif defined (SSD1963_800ALT_DRIVER)
-    #include "TFT_Drivers/SSD1963_Init.h"
-
-#endif
-
-#ifdef TFT_INVERSION_ON
-  writecommand(TFT_INVON);
-#endif
-
-#ifdef TFT_INVERSION_OFF
-  writecommand(TFT_INVOFF);
-#endif
 
   end_tft_write();
 
@@ -201,48 +137,7 @@ void TFT_eSPI::setRotation(uint8_t m)
 {
 
   begin_tft_write();
-
-    // This loads the driver specific rotation code  <<<<<<<<<<<<<<<<<<<<< ADD NEW DRIVERS TO THE LIST HERE <<<<<<<<<<<<<<<<<<<<<<<
-#if   defined (ILI9341_DRIVER)
-    #include "TFT_Drivers/ILI9341_Rotation.h"
-
-#elif defined (ST7735_DRIVER)
-    #include "TFT_Drivers/ST7735_Rotation.h"
-
-#elif defined (ILI9163_DRIVER)
-    #include "TFT_Drivers/ILI9163_Rotation.h"
-
-#elif defined (S6D02A1_DRIVER)
-    #include "TFT_Drivers/S6D02A1_Rotation.h"
-
-#elif defined (ST7796_DRIVER)
-    #include "TFT_Drivers/ST7796_Rotation.h"
-
-#elif defined (ILI9486_DRIVER)
-    #include "TFT_Drivers/ILI9486_Rotation.h"
-
-#elif defined (ILI9481_DRIVER)
-    #include "TFT_Drivers/ILI9481_Rotation.h"
-
-#elif defined (ILI9488_DRIVER)
-    #include "TFT_Drivers/ILI9488_Rotation.h"
-
-#elif defined (HX8357D_DRIVER)
-    #include "TFT_Drivers/HX8357D_Rotation.h"
-
-#elif defined (ST7789_DRIVER)
-    #include "TFT_Drivers/ST7789_Rotation.h"
-
-#elif defined (R61581_DRIVER)
-    #include "TFT_Drivers/R61581_Rotation.h"
-
-#elif defined (RM68140_DRIVER)
-	#include "TFT_Drivers/RM68140_Rotation.h"
-
-#elif defined (ST7789_2_DRIVER)
-    #include "TFT_Drivers/ST7789_2_Rotation.h"
-
-#endif
+  #include "TFT_eSPI_rotation.h"
 
   delayMicroseconds(10);
 

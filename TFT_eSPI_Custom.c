@@ -2,6 +2,8 @@
         //       TFT_eSPI generic driver functions        //
         ////////////////////////////////////////////////////
 
+// This is the part where you want the platform specific / optimized code to be
+
 ////////////////////////////////////////////////////////////////////////////////////////
 // Global variables
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -55,39 +57,5 @@ void TFT_eSPI::pushPixels(const void* data_in, uint32_t len)
         data_in+=v;
    }
   spi.endTransaction();
-#if 0        
-  if (_swapBytes) 
-      while ( len-- ) 
-      {
-          tft_Write_16(*data); data++;
-      }
-  else 
-      while ( len-- ) 
-      {
-          tft_Write_16S(*data); 
-          data++;
-      }
-#endif  
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-// End of display interface specific functions
-////////////////////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////////////////////
-//                                DMA FUNCTIONS                                         
-////////////////////////////////////////////////////////////////////////////////////////
-
-//                Placeholder for DMA functions
-
-/*
-Minimal function set to support DMA:
-
-bool TFT_eSPI::initDMA(void)
-void TFT_eSPI::deInitDMA(void)
-bool TFT_eSPI::dmaBusy(void)
-void TFT_eSPI::pushPixelsDMA(uint16_t* image, uint32_t len)
-void TFT_eSPI::pushImageDMA(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t* image)
-
-*/
