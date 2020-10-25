@@ -49,7 +49,6 @@ TFT_eSPI::TFT_eSPI(int w, int h,int pinCS, int pinDC, int pinRst)
   cursor_y  = cursor_x  = 0;
   padX = 0;             // No padding
   _swapBytes = false;   // Do not swap colour bytes by default
-  inTransaction = false;
   _booted   = true;     // Default attributes
   addr_row = 0xFFFF;
   addr_col = 0xFFFF;
@@ -79,7 +78,7 @@ void TFT_eSPI::init(uint8_t tc)
   if (_booted)
   {  
     
-    inTransaction = false;
+
     INIT_TFT_DATA_BUS;
   pinMode(_csPin, OUTPUT);
   digitalWrite(_csPin, HIGH); // Chip select high (inactive)

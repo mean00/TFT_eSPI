@@ -41,12 +41,9 @@ public:
      */
     void end_tft_write()  
     {       
-        if(!inTransaction) 
-        {      
-            CS_H;
-            _spi.endTransaction();
-            spiUnlock();
-        }
+        CS_H;
+        _spi.endTransaction();
+        spiUnlock();
     }
     
     SPIClass            &_spi;

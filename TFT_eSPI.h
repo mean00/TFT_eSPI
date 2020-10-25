@@ -247,12 +247,10 @@ protected:
  
 
   bool     _swapBytes; // Swap the byte order for TFT pushImage()
-  bool     /* MEANXlocked,*/ inTransaction; // SPI transaction and mutex lock flags
+  
 
   bool     _booted;    // init() or begin() has already run once
   
-  virtual  void spiLock() {};
-  virtual  void spiUnlock() {};
     // pinout
   int _csPin,_dcPin,_rstPin;
   int  addr_row, addr_col;    
