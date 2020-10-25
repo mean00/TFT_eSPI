@@ -58,16 +58,10 @@ TFT_eSPI::TFT_eSPI(int w, int h,int pinCS, int pinDC, int pinRst)
   _init_height = _height = h; // Set by specific xxxxx_Defines.h file or by users sketch
   rotation  = 0;
   cursor_y  = cursor_x  = 0;
-  textfont  = 1;
-  textsize  = 1;
-  textcolor   = bitmap_fg = 0xFFFF; // White
-  textbgcolor = bitmap_bg = 0x0000; // Black
   padX = 0;             // No padding
   isDigits   = false;   // No bounding box adjustment
   textwrapX  = true;    // Wrap text at end of line when using print stream
   textwrapY  = false;   // Wrap text at bottom of screen when using print stream
-  textdatum = TL_DATUM; // Top Left text alignment is default
-  fontsloaded = 0;
 
   _swapBytes = false;   // Do not swap colour bytes by default
 
@@ -75,17 +69,9 @@ TFT_eSPI::TFT_eSPI(int w, int h,int pinCS, int pinDC, int pinRst)
   inTransaction = false;
 
   _booted   = true;     // Default attributes
-
   addr_row = 0xFFFF;
   addr_col = 0xFFFF;
 
-  _xpivot = 0;
-  _ypivot = 0;
-
-  cspinmask = 0;
-  dcpinmask = 0;
-  wrpinmask = 0;
-  sclkpinmask = 0;
 
 }
 
@@ -272,9 +258,10 @@ void TFT_eSPI::setRotation(uint8_t m)
   delayMicroseconds(10);
 
   end_tft_write();
-
   addr_row = 0xFFFF;
   addr_col = 0xFFFF;
+
+
 }
 
 
@@ -420,10 +407,7 @@ uint32_t TFT_eSPI::readcommand32(uint8_t cmd_function, uint8_t index)
 }
 
 
-void TFT_eSPI::setCallback(getColorCallback getCol)
-{
-  getColor = getCol;
-}
+
 
 
 /***************************************************************************************
@@ -478,7 +462,6 @@ void TFT_eSPI::setCursor(int16_t x, int16_t y)
 ***************************************************************************************/
 void TFT_eSPI::setCursor(int16_t x, int16_t y, uint8_t font)
 {
-  textfont = font;
   cursor_x = x;
   cursor_y = y;
 }
@@ -503,81 +486,10 @@ int16_t TFT_eSPI::getCursorY(void)
 }
 
 
-/***************************************************************************************
-** Function name:           setTextSize
-** Description:             Set the text size multiplier
-***************************************************************************************/
-void TFT_eSPI::setTextSize(uint8_t s)
-{
-  if (s>7) s = 7; // Limit the maximum size multiplier so byte variables can be used for rendering
-  textsize = (s > 0) ? s : 1; // Don't allow font size 0
-}
 
 
-/***************************************************************************************
-** Function name:           setTextColor
-** Description:             Set the font foreground colour (background is transparent)
-***************************************************************************************/
-void TFT_eSPI::setTextColor(uint16_t c)
-{
-  // For 'transparent' background, we'll set the bg
-  // to the same as fg instead of using a flag
-  textcolor = textbgcolor = c;
-}
 
 
-/***************************************************************************************
-** Function name:           setTextColor
-** Description:             Set the font foreground and background colour
-***************************************************************************************/
-void TFT_eSPI::setTextColor(uint16_t c, uint16_t b)
-{
-  textcolor   = c;
-  textbgcolor = b;
-}
-
-
-/***************************************************************************************
-** Function name:           setPivot
-** Description:             Set the pivot point on the TFT
-*************************************************************************************x*/
-void TFT_eSPI::setPivot(int16_t x, int16_t y)
-{
-  _xpivot = x;
-  _ypivot = y;
-}
-
-
-/***************************************************************************************
-** Function name:           getPivotX
-** Description:             Get the x pivot position
-***************************************************************************************/
-int16_t TFT_eSPI::getPivotX(void)
-{
-  return _xpivot;
-}
-
-
-/***************************************************************************************
-** Function name:           getPivotY
-** Description:             Get the y pivot position
-***************************************************************************************/
-int16_t TFT_eSPI::getPivotY(void)
-{
-  return _ypivot;
-}
-
-
-/***************************************************************************************
-** Function name:           setBitmapColor
-** Description:             Set the foreground foreground and background colour
-***************************************************************************************/
-void TFT_eSPI::setBitmapColor(uint16_t c, uint16_t b)
-{
-  if (c == b) b = ~c;
-  bitmap_fg = c;
-  bitmap_bg = b;
-}
 
 
 /***************************************************************************************
@@ -591,14 +503,6 @@ void TFT_eSPI::setTextWrap(bool wrapX, bool wrapY)
 }
 
 
-/***************************************************************************************
-** Function name:           setTextDatum
-** Description:             Set the text position reference datum
-***************************************************************************************/
-void TFT_eSPI::setTextDatum(uint8_t d)
-{
-  textdatum = d;
-}
 
 
 /***************************************************************************************
@@ -626,15 +530,6 @@ uint16_t TFT_eSPI::getTextPadding(void)
 uint8_t TFT_eSPI::getRotation(void)
 {
   return rotation;
-}
-
-/***************************************************************************************
-** Function name:           getTextDatum
-** Description:             Return the text datum value (as used by setTextDatum())
-***************************************************************************************/
-uint8_t TFT_eSPI::getTextDatum(void)
-{
-  return textdatum;
 }
 
 
@@ -684,16 +579,8 @@ void TFT_eSPI::setAddrWindow(int32_t x0, int32_t y0, int32_t w, int32_t h)
 void TFT_eSPI::setWindow(int32_t x0, int32_t y0, int32_t x1, int32_t y1)
 {
   //begin_tft_write(); // Must be called before setWindow
-
   addr_row = 0xFFFF;
   addr_col = 0xFFFF;
-
-#ifdef CGRAM_OFFSET
-  x0+=colstart;
-  x1+=colstart;
-  y0+=rowstart;
-  y1+=rowstart;
-#endif
 
   DC_C; tft_Write_8(TFT_CASET);
   DC_D; tft_Write_32C(x0, x1);
@@ -716,43 +603,6 @@ void TFT_eSPI::setWindowLocked(int32_t x0, int32_t y0, int32_t x1, int32_t y1)
     begin_tft_write();
     setWindow(x0,y0,x1,y1);
     end_tft_write();
-}
-
-/***************************************************************************************
-** Function name:           readAddrWindow
-** Description:             define an area to read a stream of pixels
-***************************************************************************************/
-void TFT_eSPI::readAddrWindow(int32_t xs, int32_t ys, int32_t w, int32_t h)
-{
-  //begin_tft_write(); // Must be called before readAddrWindow or CS set low
-
-  int32_t xe = xs + w - 1;
-  int32_t ye = ys + h - 1;
-
-  addr_col = 0xFFFF;
-  addr_row = 0xFFFF;
-
-#ifdef CGRAM_OFFSET
-  xs += colstart;
-  xe += colstart;
-  ys += rowstart;
-  ye += rowstart;
-#endif
-
-  // Column addr set
-  DC_C; tft_Write_8(TFT_CASET);
-  DC_D; tft_Write_32C(xs, xe);
-
-  // Row addr set
-  DC_C; tft_Write_8(TFT_PASET);
-  DC_D; tft_Write_32C(ys, ye);
-
-  // Read CGRAM command
-  DC_C; tft_Write_8(TFT_RAMRD);
-
-  DC_D;
-
-  //end_tft_write(); // Must be called after readAddrWindow or CS set high
 }
 
 
