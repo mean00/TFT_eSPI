@@ -182,55 +182,6 @@ void TFT_eSPI::commandList (const uint8_t *addr)
 }
 
 
-/***************************************************************************************
-** Function name:           spiwrite
-** Description:             Write 8 bits to SPI port (legacy support only)
-***************************************************************************************/
-void TFT_eSPI::spiwrite(uint8_t c)
-{
-  begin_tft_write();
-  tft_Write_8(c);
-  end_tft_write();
-}
-
-
-/***************************************************************************************
-** Function name:           writecommand
-** Description:             Send an 8 bit command to the TFT
-***************************************************************************************/
-void TFT_eSPI::writecommand(uint8_t c)
-{
-  begin_tft_write();
-
-  DC_C;
-
-  tft_Write_8(c);
-
-  DC_D;
-
-  end_tft_write();
-
-}
-
-
-/***************************************************************************************
-** Function name:           writedata
-** Description:             Send a 8 bit data value to the TFT
-***************************************************************************************/
-void TFT_eSPI::writedata(uint8_t d)
-{
-  begin_tft_write();
-
-  DC_D;        // Play safe, but should already be in data mode
-
-  tft_Write_8(d);
-
-  CS_L;        // Allow more hold time for low VDI rail
-
-  end_tft_write();
-}
-
-
 
 
 

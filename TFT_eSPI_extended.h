@@ -54,7 +54,10 @@ protected:
     void              pushBlock(uint16_t color, uint32_t len);
     void              pushPixels(const void* data_in, uint32_t len);
     
-    SPIClass          &_spi;
+    void                spiwrite(uint8_t c);
+    void                writecommand(uint8_t c);
+    void                writedata(uint8_t d);
+    SPIClass            &_spi;
 };
 
 // eof

@@ -130,13 +130,6 @@ class TFT_eSPI : public Print{
   int16_t  getCursorX(void),                                // Read current cursor x position (moves with tft.print())
            getCursorY(void);                                // Read current cursor y position
   
-
-  // Low level read/write
-  void     spiwrite(uint8_t);        // legacy support only
-
-  void     writecommand(uint8_t c),  // Send a command, function resets DC/RS high ready for data
-           writedata(uint8_t d);     // Send data with DC/RS set high
-
   void     commandList(const uint8_t *addr); // Send a initialisation sequence to TFT stored in FLASH
 
 
@@ -199,10 +192,12 @@ protected:
                 
           }
   
-  // Put your highly optimized stuff in these 2 functions
+  // Put your highly optimized stuff in these  functions
     virtual void              pushBlock(uint16_t color, uint32_t len)=0;
     virtual void              pushPixels(const void* data_in, uint32_t len)=0;
-
+    virtual void              spiwrite(uint8_t c)=0;
+    virtual void              writecommand(uint8_t c)=0;
+    virtual void              writedata(uint8_t d)=0;
   
   
  //--------------------------------------- private ------------------------------------//
