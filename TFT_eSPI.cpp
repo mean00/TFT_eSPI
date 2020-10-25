@@ -18,12 +18,6 @@
 
 #include "TFT_eSPI_Custom.c"
 
-/***************************************************************************************
-** Function name:           Legacy - deprecated
-** Description:             Start/end transaction
-***************************************************************************************/
-  void TFT_eSPI::spi_begin()       {begin_tft_write();}
-  void TFT_eSPI::spi_end()         {  end_tft_write();}
   
 /***************************************************************************************
 ** Function name:           TFT_eSPI

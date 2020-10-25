@@ -12,9 +12,9 @@
   Last review/edit by Bodmer: 26/01/20
  ****************************************************/
 
-// Stop fonts etc being loaded multiple times
+
 #pragma once
-#define TFT_ESPI_VERSION "2.2.20"
+#define TFT_ESPI_VERSION "2.2.20_mx"
  
 /***************************************************************************************
 **                         Section 1: Load required header files
@@ -49,13 +49,6 @@ extern SPIClass& spi;
 #endif
 
 
-
-// Next is a special 16 bit colour value that encodes to 8 bits
-// and will then decode back to the same 16 bit value.
-// Convenient for 8 bit and 16 bit transparent sprites.
-#define TFT_TRANSPARENT 0x0120 // This is actually a dark green
-
-
 /***************************************************************************************
 **                         Section 8: Class member and support functions
 ***************************************************************************************/
@@ -63,11 +56,8 @@ extern SPIClass& spi;
 template <typename T> static inline void
 swap_coord(T& a, T& b) { T t = a; a = b; b = t; }
 
-// Callback prototype for smooth font pixel colour read
-typedef uint16_t (*getColorCallback)(uint16_t x, uint16_t y);
-
 // Class functions and variables
-class TFT_eSPI : public Print {
+class TFT_eSPI : public Print{
 
  //--------------------------------------- public ------------------------------------//
  public:
@@ -135,21 +125,7 @@ class TFT_eSPI : public Print {
   void     setSwapBytes(bool swap);
   bool     getSwapBytes(void);
 
-           // Draw bitmap
-  void     drawBitmap( int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t fgcolor),
-           drawBitmap( int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t fgcolor, uint16_t bgcolor),
-           drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t fgcolor),
-           drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t fgcolor, uint16_t bgcolor),
-           setBitmapColor(uint16_t fgcolor, uint16_t bgcolor); // Define the 2 colours for 1bpp sprites
 
-           // Set TFT pivot point (use when rendering rotated sprites)
-  void     setPivot(int16_t x, int16_t y);
-  int16_t  getPivotX(void), // Get pivot x
-           getPivotY(void); // Get pivot y
-
-           // The next functions can be used as a pair to copy screen blocks (or horizontal/vertical lines) to another location
-           // Read a block of pixels to a data buffer, buffer is 16 bit and the size must be at least w * h
-  void     readRect(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *data);
            // Write a block of pixels to the screen which have been read by readRect()
   void     pushRect(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *data);
 
@@ -207,12 +183,7 @@ class TFT_eSPI : public Print {
 
 
 protected:
-         // Legacy begin and end prototypes - deprecated TODO: delete
-  void     spi_begin();
-  void     spi_end();
-
-  void     spi_begin_read();
-  void     spi_end_read();
+  
 
            // New begin and end prototypes
            // begin/end a TFT write transaction
@@ -237,19 +208,7 @@ protected:
 
  //--------------------------------------- private ------------------------------------//
  private:
-      
-           // Temporary  library development function  TODO: remove need for this
-  void     pushSwapBytePixels(const void* data_in, uint32_t len);
-
-           // Same as setAddrWindow but exits with CGRAM in read mode
-  void     readAddrWindow(int32_t xs, int32_t ys, int32_t w, int32_t h);
-
-
-           // Display variant settings
-  uint8_t  tabcolor,                   // ST7735 screen protector "tab" colour (now invalid)
-           colstart = 0, rowstart = 0; // Screen display area to CGRAM area coordinate offsets
-
-           
+ 
  //-------------------------------------- protected ----------------------------------//
  protected:
 
