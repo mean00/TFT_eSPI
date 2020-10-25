@@ -30,7 +30,11 @@ public:
     void drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
     void  setFontFamily(const GFXfont *small, const GFXfont *medium, const GFXfont *big);        
     void  setFontSize(FontSize size);
-
+    void    setTextColor(int color, int bgColor)
+    {
+        textcolor=color;
+        textbgcolor=bgColor;
+    }
     void  myDrawString(const char *st, int padd_up_to_n_pixels=0);
     
 protected:    
@@ -43,6 +47,8 @@ protected:
     
     FontInfo          fontInfo[3];
     FontInfo          *currentFont;    
+    uint32_t textcolor, textbgcolor;         // Text foreground and background colours
+
 };
 
 // eof

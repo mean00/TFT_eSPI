@@ -22,7 +22,6 @@
 
 //Standard support
 #include <Arduino.h>
-#include <Print.h>
 #include <SPI.h>
 extern SPIClass& spi;
 /***************************************************************************************
@@ -177,7 +176,6 @@ class TFT_eSPI : public Print{
   static   SPIClass& getSPIinstance(void); // Get SPI class handle
 
   int32_t  cursor_x, cursor_y, padX;       // Text cursor x,y and padding setting
-  uint32_t textcolor, textbgcolor;         // Text foreground and background colours
 
   int      rotation;  // Display rotation (0-3)
 
@@ -193,7 +191,7 @@ protected:
             spiLock();
             spi.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
             CS_L; 
-            SET_BUS_WRITE_MODE;
+            
         }  
   inline void end_tft_write()        __attribute__((always_inline))
             {       
@@ -203,7 +201,7 @@ protected:
                     spi.endTransaction();
                     spiUnlock();
                 }
-                SET_BUS_READ_MODE;
+                
           }
 
  //--------------------------------------- private ------------------------------------//
