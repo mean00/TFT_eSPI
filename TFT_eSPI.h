@@ -60,9 +60,25 @@ class TFT_eSPI : public Print{
 
  //--------------------------------------- public ------------------------------------//
  public:
-
+ typedef enum FontSize
+   {
+    SmallFont,MediumFont,BigFont
+   };
+   class FontInfo
+    {
+    public:
+      int               maxHeight;          
+      int               maxWidth;
+      uint16_t         *filler;
+      const GFXfont    *font;        
+    };
+         
+    
   TFT_eSPI(int _W , int _H , int pinCS, int pinDC, int pinRst=-1);
-
+  virtual ~TFT_eSPI()
+  {
+      
+  }
   // init() and begin() are equivalent, begin() included for backwards compatibility
   // Sketch defined tab colour option is for ST7735 displays only
   void     init(uint8_t tc = TAB_COLOUR), begin(uint8_t tc = TAB_COLOUR);
@@ -160,13 +176,26 @@ class TFT_eSPI : public Print{
 
 
 
-  // Global variables
-  static   SPIClass& getSPIinstance(void); // Get SPI class handle
-
   int32_t  cursor_x, cursor_y, padX;       // Text cursor x,y and padding setting
 
-  int      rotation;  // Display rotation (0-3)
-
+    int     rotation;  // Display rotation (0-3)
+    void    drawBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
+    void    drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
+    void    setFontFamily(const GFXfont *small, const GFXfont *medium, const GFXfont *big);        
+    void    setFontSize(FontSize size);
+    void    setTextColor(int color, int bgColor)
+    {
+        textcolor=color;
+        textbgcolor=bgColor;
+    }
+    void    myDrawString(const char *st, int padd_up_to_n_pixels=0);
+    int     myDrawChar(int x, int y, unsigned char c,  int color, int bg,FontInfo &infos);
+    
+    int     mySquare(int x, int y, int w, int xheight, uint16_t *filler);
+    
+    FontInfo          fontInfo[3];
+    FontInfo          *currentFont;    
+    uint32_t          textcolor, textbgcolor;         // Text foreground and background colours
 
 protected:
   
@@ -205,7 +234,13 @@ protected:
   int _csPin,_dcPin,_rstPin;
   int  addr_row, addr_col;    
 
-virtual size_t write(uint8) {return 1;} // stub for print  
+  
+  
+  
+  virtual size_t write(uint8) {return 1;} // stub for print  
 }; // End of class TFT_eSPI
 
 // EOF
+
+      
+  

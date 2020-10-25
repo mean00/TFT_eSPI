@@ -1,11 +1,11 @@
 
-#include "TFT_eSPI_extended.h"
+#include "TFT_eSPI.h"
 
 int tftLocked=0;
 
 /**
  */
-void TFT_eSPI_extended::drawBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data)
+void TFT_eSPI::drawBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data)
 {
     uint8_t *p=(uint8_t *)data;    
     uint16_t line[320];
@@ -35,7 +35,7 @@ void TFT_eSPI_extended::drawBitmap(int width, int height, int wx, int wy, int fg
 
 /**
  */
-void TFT_eSPI_extended::drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data)
+void TFT_eSPI::drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data)
 {
     uint8_t *p=(uint8_t *)data;    
     uint16_t line[320];

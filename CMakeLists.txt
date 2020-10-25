@@ -8,7 +8,7 @@ SET(SRCS
         TFT_eSPI_extended.cpp
         TFT_eSPI_extended_glyph.cpp
         TFT_eSPI_extended_glyph_hl.cpp
-        TFT_eSPI_extended_lowLevel.cpp
+        TFT_eSPI_stm32duino.cpp
 )
 generate_arduino_library(${libPrefix}TFT_eSPI 
                             SRCS ${SRCS}

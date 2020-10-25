@@ -53,7 +53,9 @@ TFT_eSPI::TFT_eSPI(int w, int h,int pinCS, int pinDC, int pinRst)
   _booted   = true;     // Default attributes
   addr_row = 0xFFFF;
   addr_col = 0xFFFF;
-
+  currentFont=NULL;
+  textcolor=ILI9341_WHITE;
+  textbgcolor=ILI9341_BLACK;        
 
 }
 

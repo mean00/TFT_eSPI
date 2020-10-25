@@ -7,14 +7,14 @@
  * @param _DC
  * @param _RST
  */
-#include "TFT_eSPI_extended.h"
+#include "TFT_eSPI.h"
 
 /**
  * \fn mySquare
  * \brief Draw a square of w*xheight size at position x,y
  * \param filler is a prefill color array
  */
-int TFT_eSPI_extended::mySquare(int x, int y, int w, int xheight, uint16_t *filler)
+int TFT_eSPI::mySquare(int x, int y, int w, int xheight, uint16_t *filler)
 {
     if(w+x>=width())
     {
@@ -51,7 +51,7 @@ int TFT_eSPI_extended::mySquare(int x, int y, int w, int xheight, uint16_t *fill
 #else 
 #define SETCOLORdebug(...) {}
 #endif
-int TFT_eSPI_extended::myDrawChar(int x, int y, unsigned char c,  int color, int bg,FontInfo &infos)
+int TFT_eSPI::myDrawChar(int x, int y, unsigned char c,  int color, int bg,FontInfo &infos)
 {
     c -= infos.font->first;
     GFXglyph *glyph  = infos.font->glyph+c;

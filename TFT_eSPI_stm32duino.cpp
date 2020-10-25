@@ -7,13 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 // Global variables
 ////////////////////////////////////////////////////////////////////////////////////////
-#include "TFT_eSPI_extended.h"
+#include "TFT_eSPI_stm32duino.h"
 
 /***************************************************************************************
 ** Function name:           pushBlock - for STM32
 ** Description:             Write a block of pixels of the same colour
 ***************************************************************************************/
-void TFT_eSPI_extended::myDataSend( uint16_t *data, int len, int minc)
+void TFT_eSPI_stm32duino::myDataSend( uint16_t *data, int len, int minc)
 {
     while(len)
     {
@@ -26,7 +26,7 @@ void TFT_eSPI_extended::myDataSend( uint16_t *data, int len, int minc)
             data+=v;
     }   
 }
-void TFT_eSPI_extended::pushBlock(uint16_t color, uint32_t len)
+void TFT_eSPI_stm32duino::pushBlock(uint16_t color, uint32_t len)
 {
     //color=(color>>8)+((color&0xff)<<8);
     uint16_t colors[1]={color};
@@ -39,7 +39,7 @@ void TFT_eSPI_extended::pushBlock(uint16_t color, uint32_t len)
 ** Function name:           pushPixels - for STM32
 ** Description:             Write a sequence of pixels
 ***************************************************************************************/
-void TFT_eSPI_extended::pushPixels(const void* data_in, uint32_t len)
+void TFT_eSPI_stm32duino::pushPixels(const void* data_in, uint32_t len)
 {
   _spi.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE,DATA_SIZE_16BIT));
   uint16_t *data = (uint16_t*)data_in;
@@ -52,7 +52,7 @@ void TFT_eSPI_extended::pushPixels(const void* data_in, uint32_t len)
 ** Function name:           spiwrite
 ** Description:             Write 8 bits to SPI port (legacy support only)
 ***************************************************************************************/
-void TFT_eSPI_extended::spiwrite(uint8_t c)
+void TFT_eSPI_stm32duino::spiwrite(uint8_t c)
 {
   begin_tft_write();
   tft_Write_8(c);
@@ -64,7 +64,7 @@ void TFT_eSPI_extended::spiwrite(uint8_t c)
 ** Function name:           writecommand
 ** Description:             Send an 8 bit command to the TFT
 ***************************************************************************************/
-void TFT_eSPI_extended::writecommand(uint8_t c)
+void TFT_eSPI_stm32duino::writecommand(uint8_t c)
 {
   begin_tft_write();
 
@@ -83,7 +83,7 @@ void TFT_eSPI_extended::writecommand(uint8_t c)
 ** Function name:           writedata
 ** Description:             Send a 8 bit data value to the TFT
 ***************************************************************************************/
-void TFT_eSPI_extended::writedata(uint8_t d)
+void TFT_eSPI_stm32duino::writedata(uint8_t d)
 {
   begin_tft_write();
 
@@ -99,7 +99,7 @@ void TFT_eSPI_extended::writedata(uint8_t d)
  * 
  * @param c
  */
-void              TFT_eSPI_extended::rawWrite8(uint8_t c)
+void              TFT_eSPI_stm32duino::rawWrite8(uint8_t c)
 {
     _spi.transfer(c);
 }
@@ -107,7 +107,7 @@ void              TFT_eSPI_extended::rawWrite8(uint8_t c)
  * 
  * @param c
  */
-void              TFT_eSPI_extended::rawWrite16(uint16_t c)
+void              TFT_eSPI_stm32duino::rawWrite16(uint16_t c)
 {
     _spi.transfer16(c);
 }

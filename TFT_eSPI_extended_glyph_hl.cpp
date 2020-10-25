@@ -7,7 +7,7 @@
  * @param _DC
  * @param _RST
  */
-#include "TFT_eSPI_extended.h"
+#include "TFT_eSPI.h"
 
 #define pgm_read_dword(addr) (*(const unsigned long *)(addr))
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
@@ -17,7 +17,7 @@
  * 
  * @param st
  */
- void  TFT_eSPI_extended::myDrawString(const char *st,int padd_up_to_n_pixels)
+ void  TFT_eSPI::myDrawString(const char *st,int padd_up_to_n_pixels)
  {
      if(!currentFont)
          return;
@@ -65,7 +65,7 @@
  * 
  * @param size
  */
-void  TFT_eSPI_extended::setFontSize(FontSize size)
+void  TFT_eSPI::setFontSize(FontSize size)
 {
     switch(size)
     {
@@ -80,7 +80,7 @@ void  TFT_eSPI_extended::setFontSize(FontSize size)
  * \fn checkFont
  * \brief extract max width/ max height from the font
  */
-static void checkFont(const GFXfont *font, TFT_eSPI_extended::FontInfo *info)
+static void checkFont(const GFXfont *font, TFT_eSPI::FontInfo *info)
 {
     int mW=0,mH=0;
     int x,y;
@@ -104,7 +104,7 @@ static void checkFont(const GFXfont *font, TFT_eSPI_extended::FontInfo *info)
  * @param medium
  * @param big
  */
-void  TFT_eSPI_extended::setFontFamily(const GFXfont *small, const GFXfont *medium, const GFXfont *big)
+void  TFT_eSPI::setFontFamily(const GFXfont *small, const GFXfont *medium, const GFXfont *big)
 {
     checkFont(small, fontInfo+0);
     checkFont(medium,fontInfo+1);
