@@ -50,13 +50,40 @@ protected:
     FontInfo          fontInfo[3];
     FontInfo          *currentFont;    
     uint32_t          textcolor, textbgcolor;         // Text foreground and background colours
-    void              myDataSend(SPIClass &mySpi, uint16_t *data, int len, int minc);
+    void              myDataSend(uint16_t *data, int len, int minc);
     void              pushBlock(uint16_t color, uint32_t len);
     void              pushPixels(const void* data_in, uint32_t len);
     
-    void                spiwrite(uint8_t c);
-    void                writecommand(uint8_t c);
-    void                writedata(uint8_t d);
+    void              spiwrite(uint8_t c);
+    void              writecommand(uint8_t c);
+    void              writedata(uint8_t d);
+    
+    void              rawWrite8(uint8_t c);
+    void              rawWrite16(uint16_t c);
+
+    
+    /**
+     * 
+     */
+    void begin_tft_write()
+    {
+        spiLock();
+        _spi.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
+        CS_L; 
+    }  
+    /**
+     * 
+     */
+    void end_tft_write()  
+    {       
+        if(!inTransaction) 
+        {      
+            CS_H;
+            _spi.endTransaction();
+            spiUnlock();
+        }
+    }
+
     SPIClass            &_spi;
 };
 

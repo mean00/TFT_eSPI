@@ -76,7 +76,7 @@ void TFT_eSPI::init(uint8_t tc)
 {
   if (_booted)
   {  
-    spi.begin();
+    
     inTransaction = false;
     INIT_TFT_DATA_BUS;
   pinMode(_csPin, OUTPUT);
@@ -522,15 +522,6 @@ void TFT_eSPI::invertDisplay(bool i)
 
 
 
-
-/***************************************************************************************
-** Function name:           getSPIinstance
-** Description:             Get the instance of the SPI class
-***************************************************************************************/
-SPIClass& TFT_eSPI::getSPIinstance(void)
-{
-  return spi;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////
 

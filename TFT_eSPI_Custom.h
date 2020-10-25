@@ -16,9 +16,9 @@
 #define CS_L digitalWrite(_csPin, LOW)
 #define CS_H digitalWrite(_csPin, HIGH)
 
-#define tft_Write_8(C)   spi.transfer(C)
-#define tft_Write_16(C)  spi.transfer16(C)
-#define tft_Write_16S(C) spi.transfer16(((C)>>8) | ((C)<<8))
+#define tft_Write_8(C)   rawWrite8(C)
+#define tft_Write_16(C)  rawWrite16(C)
+#define tft_Write_16S(C) rawWrite8(((C)>>8) | ((C)<<8))
 
 #define tft_Write_32(C) \
 tft_Write_16((uint16_t) ((C)>>16)); \

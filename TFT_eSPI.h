@@ -23,7 +23,7 @@
 //Standard support
 #include <Arduino.h>
 #include <SPI.h>
-extern SPIClass& spi;
+
 /***************************************************************************************
 **                         Section 2: Load library and processor specific header files
 ***************************************************************************************/
@@ -170,29 +170,11 @@ class TFT_eSPI : public Print{
 
 protected:
   
-
-           // New begin and end prototypes
-           // begin/end a TFT write transaction
-           // For SPI bus the transmit clock rate is set
-  inline void begin_tft_write()      __attribute__((always_inline))
-        {
-            spiLock();
-            spi.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
-            CS_L; 
-            
-        }  
-  inline void end_tft_write()        __attribute__((always_inline))
-            {       
-                if(!inTransaction) 
-                {      
-                    CS_H;
-                    spi.endTransaction();
-                    spiUnlock();
-                }
-                
-          }
-  
-  // Put your highly optimized stuff in these  functions
+    // Put your highly optimized§platform stuff here
+    virtual void              begin_tft_write()=0;
+    virtual void              end_tft_write()=0;  
+    virtual void              rawWrite8(uint8_t c)=0;
+    virtual void              rawWrite16(uint16_t c)=0;
     virtual void              pushBlock(uint16_t color, uint32_t len)=0;
     virtual void              pushPixels(const void* data_in, uint32_t len)=0;
     virtual void              spiwrite(uint8_t c)=0;
