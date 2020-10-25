@@ -24,9 +24,7 @@
 ***************************************************************************************/
   void TFT_eSPI::spi_begin()       {begin_tft_write();}
   void TFT_eSPI::spi_end()         {  end_tft_write();}
-  void TFT_eSPI::spi_begin_read()  {begin_tft_read(); }
-  void TFT_eSPI::spi_end_read()    {  end_tft_read(); }
-
+  
 /***************************************************************************************
 ** Function name:           TFT_eSPI
 ** Description:             Constructor , we must use hardware SPI pins
@@ -59,9 +57,6 @@ TFT_eSPI::TFT_eSPI(int w, int h,int pinCS, int pinDC, int pinRst)
   rotation  = 0;
   cursor_y  = cursor_x  = 0;
   padX = 0;             // No padding
-  isDigits   = false;   // No bounding box adjustment
-  textwrapX  = true;    // Wrap text at end of line when using print stream
-  textwrapY  = false;   // Wrap text at bottom of screen when using print stream
 
   _swapBytes = false;   // Do not swap colour bytes by default
 
@@ -348,78 +343,7 @@ void TFT_eSPI::writedata(uint8_t d)
 }
 
 
-/***************************************************************************************
-** Function name:           readcommand8
-** Description:             Read a 8 bit data value from an indexed command register
-***************************************************************************************/
-uint8_t TFT_eSPI::readcommand8(uint8_t cmd_function, uint8_t index)
-{
-  uint8_t reg = 0;
 
-  // Tested with ILI9341 set to Interface II i.e. IM [3:0] = "1101"
-  begin_tft_read();
-  index = 0x10 + (index & 0x0F);
-
-  DC_C; tft_Write_8(0xD9);
-  DC_D; tft_Write_8(index);
-
-  CS_H; // Some displays seem to need CS to be pulsed here, or is just a delay needed?
-  CS_L;
-
-  DC_C; tft_Write_8(cmd_function);
-  DC_D;
-  reg = tft_Read_8();
-
-  end_tft_read();
-  return reg;
-}
-
-
-/***************************************************************************************
-** Function name:           readcommand16
-** Description:             Read a 16 bit data value from an indexed command register
-***************************************************************************************/
-uint16_t TFT_eSPI::readcommand16(uint8_t cmd_function, uint8_t index)
-{
-  uint32_t reg;
-
-  reg  = (readcommand8(cmd_function, index + 0) <<  8);
-  reg |= (readcommand8(cmd_function, index + 1) <<  0);
-
-  return reg;
-}
-
-
-/***************************************************************************************
-** Function name:           readcommand32
-** Description:             Read a 32 bit data value from an indexed command register
-***************************************************************************************/
-uint32_t TFT_eSPI::readcommand32(uint8_t cmd_function, uint8_t index)
-{
-  uint32_t reg;
-
-  reg  = ((uint32_t)readcommand8(cmd_function, index + 0) << 24);
-  reg |= ((uint32_t)readcommand8(cmd_function, index + 1) << 16);
-  reg |= ((uint32_t)readcommand8(cmd_function, index + 2) <<  8);
-  reg |= ((uint32_t)readcommand8(cmd_function, index + 3) <<  0);
-
-  return reg;
-}
-
-
-
-
-
-/***************************************************************************************
-** Function name:           push rectangle
-** Description:             push 565 pixel colours into a defined area
-***************************************************************************************/
-void TFT_eSPI::pushRect(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *data)
-{
-  bool swap = _swapBytes; _swapBytes = false;
-  pushImage(x, y, w, h, data);
-  _swapBytes = swap;
-}
 
 
 
@@ -493,37 +417,6 @@ int16_t TFT_eSPI::getCursorY(void)
 
 
 /***************************************************************************************
-** Function name:           setTextWrap
-** Description:             Define if text should wrap at end of line
-***************************************************************************************/
-void TFT_eSPI::setTextWrap(bool wrapX, bool wrapY)
-{
-  textwrapX = wrapX;
-  textwrapY = wrapY;
-}
-
-
-
-
-/***************************************************************************************
-** Function name:           setTextPadding
-** Description:             Define padding width (aids erasing old text and numbers)
-***************************************************************************************/
-void TFT_eSPI::setTextPadding(uint16_t x_width)
-{
-  padX = x_width;
-}
-
-/***************************************************************************************
-** Function name:           setTextPadding
-** Description:             Define padding width (aids erasing old text and numbers)
-***************************************************************************************/
-uint16_t TFT_eSPI::getTextPadding(void)
-{
-  return padX;
-}
-
-/***************************************************************************************
 ** Function name:           getRotation
 ** Description:             Return the rotation value (as used by setRotation())
 ***************************************************************************************/
@@ -538,7 +431,7 @@ uint8_t TFT_eSPI::getRotation(void)
 ** Description:             Return the pixel width of display (per current rotation)
 ***************************************************************************************/
 // Return the size of the display (per current rotation)
-int16_t TFT_eSPI::width(void)
+int TFT_eSPI::width(void)
 {
   return _width;
 }
@@ -548,7 +441,7 @@ int16_t TFT_eSPI::width(void)
 ** Function name:           height
 ** Description:             Return the pixel height of display (per current rotation)
 ***************************************************************************************/
-int16_t TFT_eSPI::height(void)
+int TFT_eSPI::height(void)
 {
   return _height;
 }
@@ -667,27 +560,6 @@ void TFT_eSPI::pushColor(uint16_t color, uint32_t len)
 
   pushBlock(color, len);
 
-  end_tft_write();
-}
-
-/***************************************************************************************
-** Function name:           startWrite
-** Description:             begin transaction with CS low, MUST later call endWrite
-***************************************************************************************/
-void TFT_eSPI::startWrite(void)
-{
-  begin_tft_write();
-  inTransaction = true;
-}
-
-/***************************************************************************************
-** Function name:           endWrite
-** Description:             end transaction with CS high
-***************************************************************************************/
-void TFT_eSPI::endWrite(void)
-{
-  inTransaction = false;
-  DMA_BUSY_CHECK;         // Safety check - user code should have checked this!
   end_tft_write();
 }
 
