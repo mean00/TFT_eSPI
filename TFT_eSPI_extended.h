@@ -25,6 +25,8 @@ public:
     {
         this->tex=tex;
         currentFont=NULL;
+        textcolor=ILI9341_WHITE;
+        textbgcolor=ILI9341_BLACK;
     }
     void drawBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
     void drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
