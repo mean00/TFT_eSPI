@@ -3,7 +3,7 @@
  */
 #include "TFT_eSPI_stm32duino.h"
 #include"dso_debug.h"
-TFT_eSPI_stm32duino *instance=NULL;
+
 
 #if 0
     #define DBG(x) x
@@ -48,7 +48,6 @@ void TFT_eSPI_stm32duino::txDone()
 
 TFT_eSPI_stm32duino::TFT_eSPI_stm32duino(SPIClass &spi, xMutex *tex,int _W , int _H , int pinCS, int pinDC, int pinRst)  :  TFT_eSPI(_W ,   _H ,   pinCS,   pinDC,   pinRst),_spi(spi),_tex(tex)
 {
-    instance=this;
     _sem=new xBinarySemaphore;
 }
 /**
