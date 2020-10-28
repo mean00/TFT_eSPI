@@ -2,21 +2,35 @@
  Low level platform specific stuff
  */
 #include "TFT_eSPI_stm32duino.h"
-
+#include"dso_debug.h"
 TFT_eSPI_stm32duino *instance=NULL;
+
+#if 0
+    #define DBG(x) x
+#else
+    #define DBG(x) {}
+#endif
+
+int nbStart=0;
+int nbEnd=0;
+int nbCb=0;
+int nbSpurious=0;
+
 /**
  * 
  */
-void txCallback()
+void TFT_eSPI_stm32duino::txCallback(void *cookie)
 {
-    if(instance)
-        instance->txDone();
+    TFT_eSPI_stm32duino *instance=(TFT_eSPI_stm32duino *)cookie;
+    xAssert(instance);
+    instance->txDone();    
 }
 
 /**
  */
 void TFT_eSPI_stm32duino::txDone()
-{
+{    
+   _spi.onTransmit(NULL,NULL);    
    _sem->giveFromInterrupt();
 }
 
@@ -44,7 +58,7 @@ TFT_eSPI_stm32duino::TFT_eSPI_stm32duino(SPIClass &spi, xMutex *tex,int _W , int
  * @param minc
  */
 void TFT_eSPI_stm32duino::myDataSend( uint16_t *data, int len, int minc)
-{
+{ 
     while(len)
     {
         int v;
@@ -53,13 +67,17 @@ void TFT_eSPI_stm32duino::myDataSend( uint16_t *data, int len, int minc)
         len-=v;     
         if(v>1000) // more than ~ 500 us
         {
-            _spi.onTransmit(txCallback);
+            DBG(Logger("size=%d\n",v));
+            DBG(nbStart++);
+            _spi.onTransmit(txCallback,this);
             _spi.dmaSendAsync(data,v,minc); 
             _sem->take();
-            _spi.onTransmit(NULL);
+            DBG(nbEnd++);
+            
             
         }else
         {
+       //     Logger("Xize=%d\n",v);
             _spi.dmaSend(data,v,minc); // just send and wait
         }        
         if(minc)

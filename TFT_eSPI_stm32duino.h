@@ -3,7 +3,16 @@
 #include "MapleFreeRTOS1000_pp.h"
 #include "TFT_eSPI.h"
 extern int tftLocked;
-
+/**
+ * 
+ * @param spi
+ * @param tex
+ * @param _W
+ * @param _H
+ * @param pinCS
+ * @param pinDC
+ * @param pinRst
+ */
 class  TFT_eSPI_stm32duino : public TFT_eSPI
 {
 public:    
@@ -23,10 +32,6 @@ public:
     
     void              rawWrite8(uint8_t c);
     void              rawWrite16(uint16_t c);
-
-    xMutex            *_tex;
-
-
     /**
      * 
      */
@@ -45,9 +50,10 @@ public:
         _spi.endTransaction();
         spiUnlock();
     }
-    
+    xMutex            *_tex; 
     SPIClass            &_spi;
     xBinarySemaphore    *_sem;
+static void txCallback(void *cookie);    
 };
 
 // eof
