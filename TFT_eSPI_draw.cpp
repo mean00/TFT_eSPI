@@ -30,7 +30,7 @@ void TFT_eSPI::drawCircle(int32_t x0, int32_t y0, int32_t r, uint32_t color)
   int32_t  dy = r+r;
   int32_t  p  = -(r>>1);
 
-  //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
+  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
   
 
   // These are ordered to minimise coordinate changes in x or y
@@ -124,7 +124,7 @@ void TFT_eSPI::fillCircle(int32_t x0, int32_t y0, int32_t r, uint32_t color)
   int32_t  dy = r+r;
   int32_t  p  = -(r>>1);
 
-  //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
+  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
   
 
   drawFastHLine(x0 - r, y0, dy+1, color);
@@ -201,7 +201,7 @@ void TFT_eSPI::drawEllipse(int16_t x0, int16_t y0, int32_t rx, int32_t ry, uint1
   int32_t fy2 = 4 * ry2;
   int32_t s;
 
-  //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
+  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
   
 
   for (x = 0, y = ry, s = 2*ry2+rx2*(1-2*ry); ry2*x <= rx2*y; x++) {
@@ -253,7 +253,7 @@ void TFT_eSPI::fillEllipse(int16_t x0, int16_t y0, int32_t rx, int32_t ry, uint1
   int32_t fy2 = 4 * ry2;
   int32_t s;
 
-  //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
+  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
   
 
   for (x = 0, y = ry, s = 2*ry2+rx2*(1-2*ry); ry2*x <= rx2*y; x++) {
@@ -300,7 +300,7 @@ void TFT_eSPI::fillScreen(uint32_t color)
 // Draw a rectangle
 void TFT_eSPI::drawRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color)
 {
-  //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
+  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
   
 
   drawFastHLine(x, y, w, color);
@@ -321,7 +321,7 @@ void TFT_eSPI::drawRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t col
 // Draw a rounded rectangle
 void TFT_eSPI::drawRoundRect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t r, uint32_t color)
 {
-  //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
+  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
   
 
   // smarter version
@@ -347,7 +347,7 @@ void TFT_eSPI::drawRoundRect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t
 // Fill a rounded rectangle, changed to horizontal lines (faster in sprites)
 void TFT_eSPI::fillRoundRect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t r, uint32_t color)
 {
-  //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
+  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
   
 
   // smarter version
@@ -369,7 +369,7 @@ void TFT_eSPI::fillRoundRect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t
 // Draw a triangle
 void TFT_eSPI::drawTriangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint32_t color)
 {
-  //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
+  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
   
 
   drawLine(x0, y0, x1, y1, color);
@@ -411,7 +411,7 @@ void TFT_eSPI::fillTriangle ( int32_t x0, int32_t y0, int32_t x1, int32_t y1, in
     return;
   }
 
-  //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
+  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
   
 
   int32_t
@@ -546,7 +546,7 @@ void TFT_eSPI::drawFastHLine(int32_t x, int32_t y, int32_t w, uint32_t color)
 // an efficient FastH/V Line draw routine for line segments of 2 pixels or more
 void TFT_eSPI::drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t color)
 {
-  //begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
+  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
   
 
   bool steep = abs(y1 - y0) > abs(x1 - x0);
