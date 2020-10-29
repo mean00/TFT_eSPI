@@ -30,9 +30,6 @@ void TFT_eSPI::drawCircle(int32_t x0, int32_t y0, int32_t r, uint32_t color)
   int32_t  dy = r+r;
   int32_t  p  = -(r>>1);
 
-  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
-  
-
   // These are ordered to minimise coordinate changes in x or y
   // drawPixel can then send fewer bounding box commands
   drawPixel(x0 + r, y0, color);
@@ -65,9 +62,6 @@ void TFT_eSPI::drawCircle(int32_t x0, int32_t y0, int32_t r, uint32_t color)
     }
     x++;
   }
-
-  
-  end_tft_write();              // Does nothing if Sprite class uses this function
 }
 
 
@@ -124,9 +118,6 @@ void TFT_eSPI::fillCircle(int32_t x0, int32_t y0, int32_t r, uint32_t color)
   int32_t  dy = r+r;
   int32_t  p  = -(r>>1);
 
-  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
-  
-
   drawFastHLine(x0 - r, y0, dy+1, color);
 
   while(x<r){
@@ -147,9 +138,6 @@ void TFT_eSPI::fillCircle(int32_t x0, int32_t y0, int32_t r, uint32_t color)
     drawFastHLine(x0 - r, y0 - x, dy+1, color);
 
   }
-
-  
-  end_tft_write();              // Does nothing if Sprite class uses this function
 }
 
 
@@ -201,9 +189,6 @@ void TFT_eSPI::drawEllipse(int16_t x0, int16_t y0, int32_t rx, int32_t ry, uint1
   int32_t fy2 = 4 * ry2;
   int32_t s;
 
-  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
-  
-
   for (x = 0, y = ry, s = 2*ry2+rx2*(1-2*ry); ry2*x <= rx2*y; x++) {
     // These are ordered to minimise coordinate changes in x or y
     // drawPixel can then send fewer bounding box commands
@@ -232,9 +217,6 @@ void TFT_eSPI::drawEllipse(int16_t x0, int16_t y0, int32_t rx, int32_t ry, uint1
     }
     s += rx2 * ((4 * y) + 6);
   }
-
-  
-  end_tft_write();              // Does nothing if Sprite class uses this function
 }
 
 
@@ -252,9 +234,6 @@ void TFT_eSPI::fillEllipse(int16_t x0, int16_t y0, int32_t rx, int32_t ry, uint1
   int32_t fx2 = 4 * rx2;
   int32_t fy2 = 4 * ry2;
   int32_t s;
-
-  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
-  
 
   for (x = 0, y = ry, s = 2*ry2+rx2*(1-2*ry); ry2*x <= rx2*y; x++) {
     drawFastHLine(x0 - x, y0 - y, x + x + 1, color);
@@ -277,9 +256,6 @@ void TFT_eSPI::fillEllipse(int16_t x0, int16_t y0, int32_t rx, int32_t ry, uint1
     }
     s += rx2 * ((4 * y) + 6);
   }
-
-  
-  end_tft_write();              // Does nothing if Sprite class uses this function
 }
 
 
@@ -300,17 +276,11 @@ void TFT_eSPI::fillScreen(uint32_t color)
 // Draw a rectangle
 void TFT_eSPI::drawRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color)
 {
-  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
-  
-
   drawFastHLine(x, y, w, color);
   drawFastHLine(x, y + h - 1, w, color);
   // Avoid drawing corner pixels twice
   drawFastVLine(x, y+1, h-2, color);
   drawFastVLine(x + w - 1, y+1, h-2, color);
-
-  
-  end_tft_write();              // Does nothing if Sprite class uses this function
 }
 
 
@@ -321,9 +291,6 @@ void TFT_eSPI::drawRect(int32_t x, int32_t y, int32_t w, int32_t h, uint32_t col
 // Draw a rounded rectangle
 void TFT_eSPI::drawRoundRect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t r, uint32_t color)
 {
-  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
-  
-
   // smarter version
   drawFastHLine(x + r  , y    , w - r - r, color); // Top
   drawFastHLine(x + r  , y + h - 1, w - r - r, color); // Bottom
@@ -334,9 +301,6 @@ void TFT_eSPI::drawRoundRect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t
   drawCircleHelper(x + w - r - 1, y + r    , r, 2, color);
   drawCircleHelper(x + w - r - 1, y + h - r - 1, r, 4, color);
   drawCircleHelper(x + r    , y + h - r - 1, r, 8, color);
-
-  
-  end_tft_write();              // Does nothing if Sprite class uses this function
 }
 
 
@@ -347,18 +311,12 @@ void TFT_eSPI::drawRoundRect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t
 // Fill a rounded rectangle, changed to horizontal lines (faster in sprites)
 void TFT_eSPI::fillRoundRect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t r, uint32_t color)
 {
-  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
-  
-
   // smarter version
   fillRect(x, y + r, w, h - r - r, color);
 
   // draw four corners
   fillCircleHelper(x + r, y + h - r - 1, r, 1, w - r - r - 1, color);
   fillCircleHelper(x + r    , y + r, r, 2, w - r - r - 1, color);
-
-  
-  end_tft_write();              // Does nothing if Sprite class uses this function
 }
 
 
@@ -369,15 +327,9 @@ void TFT_eSPI::fillRoundRect(int32_t x, int32_t y, int32_t w, int32_t h, int32_t
 // Draw a triangle
 void TFT_eSPI::drawTriangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint32_t color)
 {
-  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
-  
-
   drawLine(x0, y0, x1, y1, color);
   drawLine(x1, y1, x2, y2, color);
   drawLine(x2, y2, x0, y0, color);
-
-  
-  end_tft_write();              // Does nothing if Sprite class uses this function
 }
 
 
@@ -410,9 +362,6 @@ void TFT_eSPI::fillTriangle ( int32_t x0, int32_t y0, int32_t x1, int32_t y1, in
     drawFastHLine(a, y0, b - a + 1, color);
     return;
   }
-
-  begin_tft_write();          // Sprite class can use this function, avoiding begin_tft_write()
-  
 
   int32_t
   dx01 = x1 - x0,
@@ -456,9 +405,6 @@ void TFT_eSPI::fillTriangle ( int32_t x0, int32_t y0, int32_t x1, int32_t y1, in
     if (a > b) swap_coord(a, b);
     drawFastHLine(a, y, b - a + 1, color);
   }
-
-  
-  end_tft_write();              // Does nothing if Sprite class uses this function
 }
 
 /***************************************************************************************
@@ -600,12 +546,5 @@ void TFT_eSPI::drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t
   
   end_tft_write();
 }
-
-
-
-
-
-
-
 // EOF
 
