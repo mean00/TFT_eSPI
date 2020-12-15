@@ -53,6 +53,8 @@ int TFT_eSPI::mySquare(int x, int y, int w, int xheight, uint16_t *filler)
 #endif
 int TFT_eSPI::myDrawChar(int x, int y, unsigned char c,  int color, int bg,FontInfo &infos)
 {
+    if(c<infos.font->first)
+        return 0;
     c -= infos.font->first;
     GFXglyph *glyph  = infos.font->glyph+c;
     
