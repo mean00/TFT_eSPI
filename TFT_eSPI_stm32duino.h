@@ -32,6 +32,11 @@ public:
     
     void              rawWrite8(uint8_t c);
     void              rawWrite16(uint16_t c);
+    void              getTextSize(int &x, int &y)
+    {
+        x=currentFont->maxWidth;
+        y=currentFont->maxHeight;
+    }
     /**
      * 
      */
