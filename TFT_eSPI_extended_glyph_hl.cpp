@@ -60,6 +60,26 @@
          }
      }
  }
+/**
+ * 
+ * @param s
+ */
+int  TFT_eSPI::getStringSize(const char *s)
+{
+    int n=strlen(s);
+    int sz=0;
+     const GFXfont *f=currentFont->font;
+    for(int i=0;i<n;i++)
+    {
+        int c=s[i];
+         if(c<f->first)
+             continue;
+         c -= f->first;
+         GFXglyph *glyph  = f->glyph+c;
+         sz+=glyph->xAdvance;
+    }
+    return sz;
+}
 
 /**
  * 

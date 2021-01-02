@@ -206,6 +206,7 @@ class TFT_eSPI : public Print{
     void    drawRLEBitmap(int width, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
     void    setFontFamily(const GFXfont *small, const GFXfont *medium, const GFXfont *big);        
     void    setFontSize(FontSize size);
+    int     getStringSize(const char *s);
     void    setTextColor(int color, int bgColor)
     {
         textcolor=color;
